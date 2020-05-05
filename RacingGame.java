@@ -1,22 +1,20 @@
 package JavaAutomationLab;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 public class RacingGame {
     public static void main(String[] args) {
 
-        Engine bugattiEngine = new Engine(0.7f);
-        Bugatti bugatti1 = new Bugatti("Bugatti1", 0, bugattiEngine);
-
-        Engine kamazEngine = new Engine(0.3f);
-        Kamaz kamaz1 = new Kamaz("Kamaz 1", 0, kamazEngine);
+        Vehicle bugatti = VehicleFactory.createVehicle("JavaAutomationLab.Bugatti", "Bugatti Kristina", new Engine(0.7f));
+        Vehicle kamaz = VehicleFactory.createVehicle("JavaAutomationLab.Kamaz", "Kamaz Schumacher", new Engine(0.3f));
+        Vehicle suzuki = VehicleFactory.createVehicle("JavaAutomationLab.Suzuki", "Suzuki Mutsukhito", new Engine(0.5f));
 
         List<Vehicle> vehicles = new ArrayList<>();
-        vehicles.add(bugatti1);
-        vehicles.add(kamaz1);
+        vehicles.add(bugatti);
+        vehicles.add(kamaz);
+        vehicles.add(suzuki);
 
         PointLocation pointStart = new PointLocation();
         PointLocation pointEnd = new PointLocation();
@@ -32,27 +30,36 @@ public class RacingGame {
         routeSections.add(routeSection4);
 
         Route route = new Route(routeSections);
-        Race race = new Race(route, (ArrayList<Vehicle>) vehicles);
-
-        System.out.println("RouteSection includes fields of");
-        race.printAllFields(routeSections.get(0).getClass());
-
-        System.out.println("Race includes fields of");
-        race.printAllFields(race.getClass());
+        Race race = new Race(route, (ArrayList<Vehicle>) vehicles, new Supervisor());
 
         Scanner scanner = new Scanner(System.in);
 
-        race.startRacing();
+        race.getSupervisor().startRacing(race.getVehicles());
 
         while (!race.getIsFinished()) {
 
-            System.out.println("Press Enter to continue");
+            System.out.println("Press Enter to run next tick");
             scanner.nextLine();
-            race.nextTick();
+            race.getSupervisor().nextTick(race);
 
         }
     }
 }
+
+
+class VehicleFactory {
+    public static Vehicle createVehicle(String name, String vehicleName, Engine engine) {
+        try {
+
+            Class<?> vehicleClass = Class.forName(name);
+            return (Vehicle) vehicleClass.getConstructor(String.class, Engine.class).newInstance(vehicleName, engine);
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+}
+
 
 class Vehicle {
     private String name;
@@ -63,7 +70,6 @@ class Vehicle {
 
     public Vehicle(
             String name,
-            float speedCurrent,
             Engine engine
             ) {
         this.name = name;
@@ -95,7 +101,7 @@ class Vehicle {
     }
 
     public void updateCurrentTicks(float ticksSpent) {
-        this.ticksCurrent = ticksSpent;
+        this.ticksCurrent += ticksSpent;
     }
 
     public float getCurrentTicks() {
@@ -104,87 +110,78 @@ class Vehicle {
 }
 
 class Auto extends Vehicle {
-
-    public Auto(String name, float speedCurrent, Engine engine) {
-        super(name, speedCurrent, engine);
+    public Auto(String name, Engine engine) {
+        super(name, engine);
     }
 }
 
 class Bugatti extends Auto {
-    public Bugatti(String name, float speedCurrent, Engine engine) {
+    public Bugatti(String name, Engine engine) {
         super(
                 name,
-                speedCurrent,
                 engine
         );
     }
 }
 
 class Dodge extends Auto {
-    public Dodge(String name, float speedCurrent, Engine engine) {
+    public Dodge(String name, Engine engine) {
         super(
                 name,
-                speedCurrent,
                 engine
         );
     }
 }
 
 class Truck extends Vehicle {
-    public Truck(String name, float speedCurrent, Engine engine) {
+    public Truck(String name, Engine engine) {
         super(
                 name,
-                speedCurrent,
                 engine
         );
     }
 }
 
 class Kamaz extends Truck {
-    public Kamaz(String name, float speedCurrent, Engine engine) {
+    public Kamaz(String name, Engine engine) {
         super(
                 name,
-                speedCurrent,
                 engine
         );
     }
 }
 
 class Mercedes extends Truck {
-    public Mercedes(String name, float speedCurrent, Engine enginee) {
+    public Mercedes(String name, Engine enginee) {
         super(
                 name,
-                speedCurrent,
                 enginee
         );
     }
 }
 
 class Motorbike extends Vehicle {
-    public Motorbike(String name, float speedCurrent, Engine engine) {
+    public Motorbike(String name, Engine engine) {
         super(
                 name,
-                speedCurrent,
                 engine
         );
     }
 }
 
 class Suzuki extends Motorbike {
-    public Suzuki(String name, float speedCurrent, Engine engine) {
+    public Suzuki(String name, Engine engine) {
         super(
                 name,
-                speedCurrent,
                 engine
         );
     }
 }
 
 class Yamaha extends Motorbike {
-    public Yamaha(String name, float speedCurrent, Engine engine) {
+    public Yamaha(String name, Engine engine) {
         super(
                 name,
-                speedCurrent,
                 engine
         );
     }
@@ -313,7 +310,11 @@ class Engine {
 }
 
 class Supervisor {
-    private int currentTick;
+    private int currentTick = 0;
+    private HashMap<String, Float> vehicleTicksMap = new HashMap<>();
+
+    public Supervisor() {
+    }
 
     public float getCurrentTicks() {
         return currentTick;
@@ -322,43 +323,20 @@ class Supervisor {
     public void updateCurrentTicks(float ticks) {
             this.currentTick += ticks;
     }
-}
 
-class Race {
-    private Route route;
-    private ArrayList<Vehicle> vehicles;
-    private boolean isFinished;
-
-    public Race(Route route, ArrayList<Vehicle> vehicles) {
-        this.route = route;
-        this.vehicles = vehicles;
-        this.isFinished = false;
-    }
-
-    public boolean getIsFinished() {
-        return isFinished;
-    }
-    public static void printSortedVehiclesByTime(ArrayList<Vehicle> vehicles) {
-
-        // copying for security reasons
-        List<Vehicle> sortedVehicles = new ArrayList<>(vehicles);
-
-        for (int i = 0; i < sortedVehicles.size(); i++) {
-            for (int j = i + 1; j < sortedVehicles.size(); j++) {
-                if (sortedVehicles.get(i).getCurrentTicks() > sortedVehicles.get(j).getCurrentTicks()) {
-                    Vehicle temp = sortedVehicles.get(j);
-                    sortedVehicles.set(j, sortedVehicles.get(i));
-                    sortedVehicles.set(i, temp);
-                }
+    public void createVehiclesMap(ArrayList<Vehicle> vehicles) {
+        for (Vehicle vehicle: vehicles) {
+            if (vehicleTicksMap.containsKey(vehicle.getName())) {
+                throw new RuntimeException("All Vehicles must have unique names!");
+            }
+            else {
+                vehicleTicksMap.put(vehicle.getName(), 0f);
             }
         }
-
-        for (int i = 0; i < sortedVehicles.size(); i++) {
-            System.out.println(Integer.toString(i + 1) + " " + sortedVehicles.get(i).getName());
-        }
     }
 
-    public void startRacing() {
+    public void startRacing(ArrayList<Vehicle> vehicles) {
+        createVehiclesMap(vehicles);
         System.out.println("Start!");
     }
 
@@ -368,16 +346,43 @@ class Race {
     }
 
     public void announceWinner() {
-        System.out.println("Winner is");
-        printSortedVehiclesByTime(this.vehicles);
+        System.out.println("Final Standings");
+        printSortedVehiclesByTime();
     }
 
-    public void nextTick() {
+    public void printSortedVehiclesByTime() {
+
+        Comparator<Map.Entry<String, Float>> valueComparator = new Comparator<Map.Entry<String,Float>>() {
+
+            @Override
+            public int compare(Map.Entry<String, Float> e1, Map.Entry<String, Float> e2) {
+                float v1 = e1.getValue();
+                float v2 = e2.getValue();
+                return (int) (v1 - v2);
+            }
+        };
+
+        Set<Map.Entry<String, Float>> entries = vehicleTicksMap.entrySet();
+        // Sort method needs a List, so let's first convert Set to List in Java
+        List<Map.Entry<String, Float>> listOfEntries = new ArrayList<Map.Entry<String, Float>>(entries);
+        listOfEntries.sort(valueComparator);
+        for(Map.Entry<String, Float> entry : listOfEntries){
+            System.out.println(entry.getKey() + " ==> " + Float.toString(entry.getValue()));
+        }
+
+    }
+
+    public void nextTick(Race race) {
 
         boolean isFinished = true;
 
+        Route route = race.getRoute();
+
+        List<Vehicle> vehicles = race.getVehicles();
+
         for (int i = 0; i < vehicles.size(); i++) {
             Vehicle currentVehicle = vehicles.get(i);
+
             float point = currentVehicle.getPoint();
 
             if (point >= route.getTotalDistance()) {
@@ -386,8 +391,8 @@ class Race {
 
             float speedMax = vehicles.get(i).getEngine().getSpeedMax();
 
-            float currentRouteSectionIndex = point;
-            RouteSection currentRouteSection = route.getRouteSections().get((int)currentRouteSectionIndex);
+            float currentRouteSectionIndex = (int) point;
+            RouteSection currentRouteSection = route.getRouteSections().get((int) currentRouteSectionIndex);
 
             float tickCapacity = 1F;
             float ticksSpent = 0F;
@@ -396,13 +401,13 @@ class Race {
 
                 float currentSpeed = currentVehicle.getSpeedCurrent();
                 float currentFrictionCoef = currentRouteSection.getFrictionCoef();
-                RouteSection currentVector = route.getRouteSections().get((int)currentRouteSectionIndex);
+                RouteSection currentVector = route.getRouteSections().get((int) currentRouteSectionIndex);
 
                 currentSpeed = currentFrictionCoef * speedMax;
 
                 if (point + currentSpeed * (tickCapacity - ticksSpent) > currentRouteSectionIndex + 1) {
 
-                    currentRouteSectionIndex += 1; // переходим на следующий участок
+                    currentRouteSectionIndex += 1.0f; // переходим на следующий участок
                     ticksSpent = ((float) currentRouteSectionIndex - point) / currentSpeed;
                     point = (float) currentRouteSectionIndex;
 
@@ -415,22 +420,57 @@ class Race {
                 if (point < route.getTotalDistance()) {
                     isFinished = false;
                 } else {
-                    break;
+                    tickCapacity = ticksSpent;
                 }
 
                 currentVehicle.setPoint(point);
-                currentVehicle.updateCurrentTicks(ticksSpent);
-
-            }
-
-            if (isFinished) {
-                this.isFinished = true;
-                endRacing();
+                // currentVehicle.updateCurrentTicks(ticksSpent);
+                float prevTicks = vehicleTicksMap.get(currentVehicle.getName());
+                vehicleTicksMap.put(currentVehicle.getName(), prevTicks + ticksSpent);
             }
         }
+
+        if (isFinished) {
+            race.setFinished(true);
+            endRacing();
+        }
+    }
+}
+
+class Race {
+    private Route route;
+    private ArrayList<Vehicle> vehicles;
+    private boolean isFinished;
+    private Supervisor supervisor;
+
+    public Race(Route route, ArrayList<Vehicle> vehicles, Supervisor supervisor) {
+        this.route = route;
+        this.vehicles = vehicles;
+        this.isFinished = false;
+        this.supervisor = supervisor;
     }
 
-    public void printAllFields(Class<?> myClass) {
+    public ArrayList<Vehicle> getVehicles() {
+        return vehicles;
+    }
+
+    public Supervisor getSupervisor() {
+        return supervisor;
+    }
+
+    public Route getRoute() {
+        return route;
+    }
+
+    public boolean getIsFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
+    }
+
+    public static void printAllFields(Class<?> myClass) {
         Field[] fieldsClass = myClass.getDeclaredFields();
         Field[] fieldsSuperClass = myClass.getSuperclass().getDeclaredFields();
 
