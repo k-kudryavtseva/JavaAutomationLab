@@ -14,7 +14,7 @@ public class RacingGame {
         Engine kamazEngine = new Engine(0.3f);
         Kamaz kamaz1 = new Kamaz("Kamaz 1", 0, kamazEngine);
 
-        ArrayList<Vehicle> vehicles = new ArrayList<>();
+        List<Vehicle> vehicles = new ArrayList<>();
         vehicles.add(bugatti1);
         vehicles.add(kamaz1);
 
@@ -25,19 +25,19 @@ public class RacingGame {
         RouteSection routeSection3 = new HaulRoad(pointStart, pointEnd);
         RouteSection routeSection4 = new Highway(pointStart, pointEnd);
 
-        ArrayList<RouteSection> routeSections = new ArrayList<>();
+        List<RouteSection> routeSections = new ArrayList<>();
         routeSections.add(routeSection1);
         routeSections.add(routeSection2);
         routeSections.add(routeSection3);
         routeSections.add(routeSection4);
 
         Route route = new Route(routeSections);
-        Race race = new Race(route, vehicles);
+        Race race = new Race(route, (ArrayList<Vehicle>) vehicles);
 
-        System.out.println("RouteSection:");
+        System.out.println("RouteSection includes fields of");
         race.printAllFields(routeSections.get(0).getClass());
 
-        System.out.println("Race:");
+        System.out.println("Race includes fields of");
         race.printAllFields(race.getClass());
 
         Scanner scanner = new Scanner(System.in);
@@ -56,8 +56,8 @@ public class RacingGame {
 
 class Vehicle {
     private String name;
-    private float point = 0;
-    private float speedCurrent = 0;
+    private float point;
+    private float speedCurrent;
     private Engine engine;
     private float ticksCurrent;
 
@@ -191,13 +191,13 @@ class Yamaha extends Motorbike {
 }
 
 class Route {
-    private ArrayList<RouteSection> routeSections;
+    private List<RouteSection> routeSections;
 
-    public Route(ArrayList<RouteSection> routeSections) {
+    public Route(List<RouteSection> routeSections) {
         this.routeSections = routeSections;
     }
 
-    public ArrayList<RouteSection> getRouteSections() {
+    public List<RouteSection> getRouteSections() {
         return routeSections;
     }
 
@@ -312,14 +312,6 @@ class Engine {
     }
 }
 
-interface IGarage {
-    public void updateVehiclePart();
-
-    public void addVehiclePart();
-
-    public void deleteVehiclePart();
-}
-
 class Supervisor {
     private int currentTick;
 
@@ -330,24 +322,9 @@ class Supervisor {
     public void updateCurrentTicks(float ticks) {
             this.currentTick += ticks;
     }
-
-    public void printAllFields(Class<?> myClass) {
-        Field[] fieldsClass = myClass.getDeclaredFields();
-        Field[] fieldsSuperClass = myClass.getSuperclass().getDeclaredFields();
-
-        System.out.println("Class Fields");
-        for (Field field: fieldsClass) {
-            System.out.println(field.getName() + " " + field.getType());
-        }
-
-        System.out.println("Superlass Fields");
-        for (Field field: fieldsSuperClass) {
-            System.out.println(field.getName() + " " + field.getType());
-        }
-    }
 }
 
-class Race extends Supervisor {
+class Race {
     private Route route;
     private ArrayList<Vehicle> vehicles;
     private boolean isFinished;
@@ -450,6 +427,21 @@ class Race extends Supervisor {
                 this.isFinished = true;
                 endRacing();
             }
+        }
+    }
+
+    public void printAllFields(Class<?> myClass) {
+        Field[] fieldsClass = myClass.getDeclaredFields();
+        Field[] fieldsSuperClass = myClass.getSuperclass().getDeclaredFields();
+
+        System.out.println("Class:");
+        for (Field field: fieldsClass) {
+            System.out.println(field.getName() + " " + field.getType());
+        }
+
+        System.out.println("Superclass:");
+        for (Field field: fieldsSuperClass) {
+            System.out.println(field.getName() + " " + field.getType());
         }
     }
 }
