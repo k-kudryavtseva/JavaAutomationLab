@@ -48,9 +48,15 @@ public class RacingGame {
 
 
 class VehicleFactory {
+    /**
+     * Creates vehicles using reflection
+     * @param name
+     * @param vehicleName
+     * @param engine
+     * @return instance of vehicle inheritor
+     */
     public static Vehicle createVehicle(String name, String vehicleName, Engine engine) {
         try {
-
             Class<?> vehicleClass = Class.forName(name);
             return (Vehicle) vehicleClass.getConstructor(String.class, Engine.class).newInstance(vehicleName, engine);
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
@@ -60,13 +66,11 @@ class VehicleFactory {
     }
 }
 
-
 class Vehicle {
     private String name;
     private float point;
     private float speedCurrent;
     private Engine engine;
-    private float ticksCurrent;
 
     public Vehicle(
             String name,
@@ -98,14 +102,6 @@ class Vehicle {
 
     public Engine getEngine() {
         return engine;
-    }
-
-    public void updateCurrentTicks(float ticksSpent) {
-        this.ticksCurrent += ticksSpent;
-    }
-
-    public float getCurrentTicks() {
-        return ticksCurrent;
     }
 }
 
@@ -293,6 +289,27 @@ class Wheel {
     }
 }
 
+class AutoWheel extends Wheel {
+
+    public AutoWheel(float frictionCoef) {
+        super(frictionCoef);
+    }
+}
+
+class TruckWheel extends Wheel {
+
+    public TruckWheel(float frictionCoef) {
+        super(frictionCoef);
+    }
+}
+
+class MotorbikeWheel extends Wheel {
+
+    public MotorbikeWheel(float frictionCoef) {
+        super(frictionCoef);
+    }
+}
+
 class Engine {
     private float speedMax;
 
@@ -309,8 +326,29 @@ class Engine {
     }
 }
 
+class AutoEngine extends Engine {
+
+    public AutoEngine(float speedMax) {
+        super(speedMax);
+    }
+}
+
+class TruckEngine extends Engine {
+
+    public TruckEngine(float speedMax) {
+        super(speedMax);
+    }
+}
+
+class MotorbikeEngine extends Engine {
+
+    public MotorbikeEngine(float speedMax) {
+        super(speedMax);
+    }
+}
+
 class Supervisor {
-    private int currentTick = 0;
+    private int currentTick;
     private HashMap<String, Float> vehicleTicksMap = new HashMap<>();
 
     public Supervisor() {
@@ -320,10 +358,19 @@ class Supervisor {
         return currentTick;
     }
 
+    /**
+     * Adds ticks spent during current step to previously spent ticks
+     * @param ticks - quantity of passed ticks, float
+     */
     public void updateCurrentTicks(float ticks) {
             this.currentTick += ticks;
     }
 
+    /**
+     * Creates map of exclusive vehicles
+     * @param vehicles - vehicles participating in the race
+     * @throws RuntimeException - if a vehicle isn't exclusive
+     */
     public void createVehiclesMap(ArrayList<Vehicle> vehicles) {
         for (Vehicle vehicle: vehicles) {
             if (vehicleTicksMap.containsKey(vehicle.getName())) {
@@ -350,6 +397,10 @@ class Supervisor {
         printSortedVehiclesByTime();
     }
 
+    /**
+     * Prints list of vehicles according to the spent time on the race (from the smallest to the largest time),
+     * where spent time = quantity of ticks
+     */
     public void printSortedVehiclesByTime() {
 
         Comparator<Map.Entry<String, Float>> valueComparator = new Comparator<Map.Entry<String,Float>>() {
@@ -367,11 +418,15 @@ class Supervisor {
         List<Map.Entry<String, Float>> listOfEntries = new ArrayList<Map.Entry<String, Float>>(entries);
         listOfEntries.sort(valueComparator);
         for(Map.Entry<String, Float> entry : listOfEntries){
-            System.out.println(entry.getKey() + " ==> " + Float.toString(entry.getValue()));
+            System.out.println(entry.getKey() + " ==> " + entry.getValue());
         }
-
     }
 
+    /**
+     * Moves vehicles along the route (until all vehicles finish or current tick is spent)
+     * @param race - an object of class Race
+     * @see JavaAutomationLab.Race # consists of route sections
+     */
     public void nextTick(Race race) {
 
         boolean isFinished = true;
@@ -424,7 +479,6 @@ class Supervisor {
                 }
 
                 currentVehicle.setPoint(point);
-                // currentVehicle.updateCurrentTicks(ticksSpent);
                 float prevTicks = vehicleTicksMap.get(currentVehicle.getName());
                 vehicleTicksMap.put(currentVehicle.getName(), prevTicks + ticksSpent);
             }
@@ -468,20 +522,5 @@ class Race {
 
     public void setFinished(boolean finished) {
         isFinished = finished;
-    }
-
-    public static void printAllFields(Class<?> myClass) {
-        Field[] fieldsClass = myClass.getDeclaredFields();
-        Field[] fieldsSuperClass = myClass.getSuperclass().getDeclaredFields();
-
-        System.out.println("Class:");
-        for (Field field: fieldsClass) {
-            System.out.println(field.getName() + " " + field.getType());
-        }
-
-        System.out.println("Superclass:");
-        for (Field field: fieldsSuperClass) {
-            System.out.println(field.getName() + " " + field.getType());
-        }
     }
 }
