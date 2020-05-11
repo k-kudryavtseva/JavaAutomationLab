@@ -5,27 +5,27 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class RacingGame {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         Vehicle bugatti = VehicleFactory.createVehicle(
                 "JavaAutomationLab.Auto",
                 "Bugatti Kristina",
                 1.5f,
-                new V8Engine(),
+                new V4Engine(),
                 new LowProfileTread()
         );
         Vehicle kamaz = VehicleFactory.createVehicle(
                 "JavaAutomationLab.Truck",
                 "Kamaz Schumacher",
-                7f,
+                10f,
                 new V8Engine(),
                 new OffRoadTread()
         );
         Vehicle suzuki = VehicleFactory.createVehicle(
                 "JavaAutomationLab.Motorbike",
                 "Suzuki Mutsukhito",
-                0.35f,
-                new V4Engine(),
+                0.2f,
+                new V6Engine(),
                 new OffRoadTread()
         );
 
@@ -36,21 +36,18 @@ public class RacingGame {
 
         PointLocation pointStart = new PointLocation();
         PointLocation pointEnd = new PointLocation();
+        RouteSection routeSection1 = new CityRoad(pointStart, pointEnd);
+        RouteSection routeSection2 = new CountryRoad(pointStart, pointEnd);
+        RouteSection routeSection3 = new HaulRoad(pointStart, pointEnd);
+        RouteSection routeSection4 = new Highway(pointStart, pointEnd);
 
-        Random randomRoute;
-        randomRoute = new Random();
-        String[] routeSections = RouteSection.getMaterialMap().keySet().toArray(new String[RouteSection.getMaterialMap().size()]);
+        List<RouteSection> routeSections = new ArrayList<>();
+        routeSections.add(routeSection1);
+        routeSections.add(routeSection2);
+        routeSections.add(routeSection3);
+        routeSections.add(routeSection4);
 
-        int quantityOfSections = 6;
-        List<RouteSection> finalRoute = new ArrayList<>();
-        for (int i = 0; i < quantityOfSections; i++) {
-            int randomIndex = randomRoute.nextInt(routeSections.length);
-            String randomSection = routeSections[randomIndex];
-            RouteSection routeSect = new RouteSection(randomSection);
-            finalRoute.add(routeSect);
-        }
-
-        Route route = new Route(finalRoute);
+        Route route = new Route(routeSections);
         Race race = new Race(route, (ArrayList<Vehicle>) vehicles, new Supervisor());
 
         Scanner scanner = new Scanner(System.in);

@@ -100,7 +100,7 @@ public class Supervisor {
 
                 RouteSection currentVector = route.getRouteSections().get((int) currentRouteSectionIndex);
 
-                float currentSpeed = currentVehicle.getSpeedCurrent(currentVector.getMaterial());
+                float currentSpeed = currentVehicle.getSpeedCurrent(currentVector.getMaterialName());
 
                 if (point + currentSpeed * (tickCapacity - ticksSpent) > currentRouteSectionIndex + 1) {
 

@@ -2,7 +2,7 @@ package JavaAutomationLab;
 
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class VehicleFactory {
+public class VehicleFactory {
     /**
      * Creates vehicles using reflection
      * @param name
