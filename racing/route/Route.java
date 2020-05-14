@@ -1,4 +1,4 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.route;
 
 import java.util.List;
 

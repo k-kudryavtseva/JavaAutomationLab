@@ -1,4 +1,8 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.vehicle;
+
+import JavaAutomationLab.racing.engine.Engine;
+import JavaAutomationLab.racing.exception.UnknownRoadMaterialException;
+import JavaAutomationLab.racing.wheel.Wheel;
 
 public class Vehicle {
     private String name;

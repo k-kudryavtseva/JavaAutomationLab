@@ -1,4 +1,4 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.engine;
 
 public class Engine {
     private float enginePower;

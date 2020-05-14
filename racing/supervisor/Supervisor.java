@@ -1,4 +1,10 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.supervisor;
+
+import JavaAutomationLab.racing.exception.UnknownRoadMaterialException;
+import JavaAutomationLab.racing.race.Race;
+import JavaAutomationLab.racing.route.Route;
+import JavaAutomationLab.racing.route.RouteSection;
+import JavaAutomationLab.racing.vehicle.Vehicle;
 
 import java.util.*;
 
@@ -71,7 +77,7 @@ public class Supervisor {
     /**
      * Moves vehicles along the route (until all vehicles finish or current tick is spent)
      * @param race - an object of class Race
-     * @see JavaAutomationLab.Race # consists of route sections
+     * @see Race # consists of route sections
      */
     public void nextTick(Race race) throws UnknownRoadMaterialException {
 

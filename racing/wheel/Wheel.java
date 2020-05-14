@@ -1,4 +1,6 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.wheel;
+
+import JavaAutomationLab.racing.exception.UnknownRoadMaterialException;
 
 public abstract class Wheel {
 

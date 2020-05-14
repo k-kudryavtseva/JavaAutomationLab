@@ -1,4 +1,4 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.engine;
 
 public class V8Engine extends Engine {
 
