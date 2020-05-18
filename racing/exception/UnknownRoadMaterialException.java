@@ -1,4 +1,4 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.exception;
 
 public class UnknownRoadMaterialException extends Exception {
     public UnknownRoadMaterialException (String materialName) {

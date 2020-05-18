@@ -1,4 +1,8 @@
-package JavaAutomationLab;
+package JavaAutomationLab.racing.race;
+
+import JavaAutomationLab.racing.route.Route;
+import JavaAutomationLab.racing.supervisor.Supervisor;
+import JavaAutomationLab.racing.vehicle.Vehicle;
 
 import java.util.ArrayList;
 
