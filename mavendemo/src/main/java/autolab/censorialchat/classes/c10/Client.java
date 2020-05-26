@@ -1,81 +1,106 @@
 package autolab.censorialchat.classes.c10;
 
-import autolab.censorialchat.classes.bo.ConnectMessage;
-import autolab.censorialchat.classes.bo.ResponseMessage;
 import autolab.censorialchat.constant.C10Constant;
-import autolab.censorialchat.io.interfaces.Packable;
 import autolab.censorialchat.util.PropertyUtil;
-import autolab.censorialchat.util.SerializationUtil;
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Scanner;
+import java.util.UUID;
 
-/**
- * 1. object streams
- * 2. task
- * 3. swap strings
- * 33. loggers (stdin, stdout, stderr)
- * 4. refactoring
- * 5. fixes
- */
-public class Client extends Thread {
 
-    public void run() {
+public class Client {
+    private final static Logger LOGGER = Logger.getLogger(Client.class);
 
+    public static void main(String[] args) {
+        BasicConfigurator.configure();
+        new Client();
     }
 
-    public static void main(String[] args) throws IOException {
-        final String HOST = PropertyUtil.getValueByKey(C10Constant.HOSTNAME);
-        final int PORT = Integer.parseInt(PropertyUtil.getValueByKey(C10Constant.PORT));
-        final String TOKEN = PropertyUtil.getValueByKey(C10Constant.TOKEN);
+    private final String HOST;
+    private final int PORT;
 
-        String path = System.getProperty("user.dir") + "/src/main/resources/client1";
+    private Socket socket;
+    private BufferedReader in;
+    private PrintWriter out;
+    private final Scanner scanner;
+
+    public Client(){
+        this.scanner = new Scanner(System.in);
+
+        HOST = PropertyUtil.getValueByKey(C10Constant.HOSTNAME);
+        PORT = Integer.parseInt(PropertyUtil.getValueByKey(C10Constant.PORT));
+
+        UUID uuid = UUID.randomUUID();
+
         try {
-            Path p = Paths.get(path);
             try {
-                Files.createFile(p);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                initClient();
 
-            connect(HOST, PORT, TOKEN);
-            System.out.println(((ResponseMessage) getResponse()).getResp());
+                out.println(uuid.toString());
 
-            Scanner in = new Scanner(System.in);
+                Listener listener = new Listener();
+                listener.start();
 
-            while (true) {
-
-                String answer = in.nextLine();
-
-                if (answer.equalsIgnoreCase("quit")) {
-                    System.out.println("Bye bye");
-                    break;
+                String str = "";
+                while (!str.equalsIgnoreCase("quit")) {
+                    str = scanner.nextLine();
+                    out.println(str);
                 }
 
-                Packable pkg = new ConnectMessage(HOST, PORT, TOKEN, answer);
-                SerializationUtil.writeObject(pkg);
-
+            } finally {
+                close();
             }
-        }
-        catch (Exception e) {
+        } catch (IOException e){
+            LOGGER.error("Something went wrong. Reload chat");
             e.printStackTrace();
         }
-        finally {
-            Files.delete(Paths.get(path));
+    }
+
+    private void initClient() throws IOException {
+        this.socket = new Socket(this.HOST, this.PORT);
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        this.out = new PrintWriter(socket.getOutputStream(), true);
+        LOGGER.info(String.format("Connected to %s:%s", this.HOST, this.PORT));
+    }
+
+    private void close(){
+        try {
+            if (socket != null){
+                socket.close();
+            }
+            in.close();
+            out.close();
+            System.exit(-1);
+        } catch (IOException e) {
+            LOGGER.error("Error closing connections");
+            e.printStackTrace();
+        }
+    }
+
+    private class Listener extends Thread {
+        private boolean stop;
+
+        public void setStop() {
+            stop = true;
         }
 
-    }
-
-    private static void connect(final String host, final int port, final String token) {
-        String msg = "Client connected";
-        Packable pkg = (Packable) new ConnectMessage(host, port, token, msg);
-        SerializationUtil.writeObject(pkg);
-    }
-
-    private static Packable getResponse() {
-        return (Packable) SerializationUtil.readResponse();
+        @Override
+        public void run() {
+            try {
+                while (!stop) {
+                    String str = in.readLine();
+                    LOGGER.info(str);
+                }
+            } catch (IOException e) {
+                setStop();
+                e.printStackTrace();
+            }
+        }
     }
 }
