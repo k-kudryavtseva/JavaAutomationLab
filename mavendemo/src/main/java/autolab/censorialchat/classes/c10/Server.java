@@ -15,7 +15,7 @@ public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
 
     private static final String HOST = "127.0.0.1";
-    private static final int PORT = 8000;
+    private static final int PORT = 8001;
 
     private static final String PATH_TO_BAD_WORDS = System.getProperty("user.dir") + "/src/main/java/autolab/censorialchat/swearwords.txt";
 
@@ -105,9 +105,9 @@ public class Server {
             try {
 
                 name = in.readLine();
-
-                chatHistory.forEach(historyMsg -> out.println(historyMsg));
                 sendMsgForAll(name + " connected");
+
+                sendChatHistory();
 
                 String str = "";
                 while (true) {
@@ -115,7 +115,7 @@ public class Server {
                     if (str.equalsIgnoreCase("quit")) break;
 
                     String processedMessage = str;
-                    processedMessage = validateMessage(processedMessage, taboo);
+                    processedMessage = validateMessage(processedMessage);
                     processedMessage = EmojiParser.parseToUnicode(processedMessage);
 
                     processedMessage = name + ": " + processedMessage;
@@ -128,6 +128,13 @@ public class Server {
                 e.printStackTrace();
             } finally {
                 close();
+            }
+        }
+        
+        private void sendChatHistory() {
+            //chatHistory.forEach(historyMsg -> out.println(historyMsg));
+            for (String str: chatHistory) {
+                out.println(str);
             }
         }
 
@@ -162,12 +169,12 @@ public class Server {
         return badword.replaceFirst(badword.substring(index, index + 1), "(•_•)");
     }
 
-    private String validateMessage(String message, HashSet<String> swearwords) {
+    private String validateMessage(String message) {
         if (Pattern.matches(".*\\p{InCyrillic}.*", message)) {
             return "Cyrillic message which we can't show";
         } else {
             String modifiedMessage = message;
-            for (String badword : swearwords) {
+            for (String badword : taboo) {
                 if (modifiedMessage.contains(badword)) {
                     modifiedMessage = modifiedMessage.replace(badword, replaceSymbol(badword));
                 }
