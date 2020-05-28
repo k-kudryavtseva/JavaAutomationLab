@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 
-public class BaseNERFilter {
+public abstract class BaseNERFilter implements IFilter{
 
     InputStream inputStream;
     TokenNameFinderModel model;
@@ -57,5 +57,10 @@ public class BaseNERFilter {
             }
         }
         return result;
+    }
+
+    @Override
+    public String filter(String string) {
+        return capitalizeNamedEntities(string);
     }
 }

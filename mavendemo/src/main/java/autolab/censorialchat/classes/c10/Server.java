@@ -16,6 +16,9 @@ public class Server {
     private final static int PORT = 8001;
     private NERPersonFilter nerPersonFilter;
     private NERLocationFilter nerLocationFilter;
+    private static CensorialFilter censorialFilter = new CensorialFilter();
+    private static EmojiFilter emojiFilter = new EmojiFilter();
+    private static SpaceFilter spaceFilter = new SpaceFilter();
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
@@ -99,11 +102,11 @@ public class Server {
                     if (str.equalsIgnoreCase("quit")) break;
 
                     String processedMessage = str;
-                    processedMessage = CensorialFilter.validateMessage(processedMessage);
-                    processedMessage = EmojiFilter.replaceEmoji(processedMessage);
-                    processedMessage = nerPersonFilter.capitalizeNamedEntities(processedMessage);
-                    processedMessage = nerLocationFilter.capitalizeNamedEntities(processedMessage);
-                    processedMessage = SpaceFilter.deleteSpace(processedMessage);
+                    processedMessage = censorialFilter.filter(processedMessage);
+                    processedMessage = emojiFilter.filter(processedMessage);
+                    processedMessage = nerPersonFilter.filter(processedMessage);
+                    processedMessage = nerLocationFilter.filter(processedMessage);
+                    processedMessage = spaceFilter.filter(processedMessage);
 
                     processedMessage = name + ": " + processedMessage;
                     sendMsgForAll(processedMessage);

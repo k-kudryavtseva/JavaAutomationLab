@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-public class CensorialFilter {
+public class CensorialFilter implements IFilter {
     private static HashSet<String> taboo;
     private static final String PATH_TO_BAD_WORDS = System.getProperty("user.dir") + "/src/main/java/autolab/censorialchat/swearwords.txt";
 
@@ -43,5 +43,10 @@ public class CensorialFilter {
             }
             return modifiedMessage;
         }
+    }
+
+    @Override
+    public String filter(String string) {
+        return validateMessage(string);
     }
 }
