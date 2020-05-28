@@ -1,6 +1,6 @@
 package autolab.censorialchat.classes.c10;
 
-import com.vdurmont.emoji.EmojiParser;
+import autolab.censorialchat.filters.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
 
@@ -8,18 +8,14 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import java.util.regex.Pattern;
 
 
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
-
-    private static final String HOST = "127.0.0.1";
-    private static final int PORT = 8001;
-
-    private static final String PATH_TO_BAD_WORDS = System.getProperty("user.dir") + "/src/main/java/autolab/censorialchat/swearwords.txt";
-
-    private HashSet<String> taboo;
+    private final static String HOST = "127.0.0.1";
+    private final static int PORT = 8001;
+    private NERPersonFilter nerPersonFilter;
+    private NERLocationFilter nerLocationFilter;
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
@@ -30,26 +26,14 @@ public class Server {
     private final List<String> chatHistory = Collections.synchronizedList(new ArrayList<>());
     private ServerSocket server;
 
-    private void readBadWords() {
-        taboo = new HashSet<String>();
-        try (FileReader reader = new FileReader(PATH_TO_BAD_WORDS);
-             BufferedReader bufferedReader = new BufferedReader(reader))
-        {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                taboo.add(line.toLowerCase());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public Server() {
         try {
+            nerPersonFilter = new NERPersonFilter();
+            nerLocationFilter = new NERLocationFilter();
             server = new ServerSocket(PORT);
             LOGGER.info("server up");
 
-            readBadWords();
+            CensorialFilter.readBadWords();
 
             while (true) {
                 Socket socket = server.accept();
@@ -115,8 +99,11 @@ public class Server {
                     if (str.equalsIgnoreCase("quit")) break;
 
                     String processedMessage = str;
-                    processedMessage = validateMessage(processedMessage);
-                    processedMessage = EmojiParser.parseToUnicode(processedMessage);
+                    processedMessage = CensorialFilter.validateMessage(processedMessage);
+                    processedMessage = EmojiFilter.replaceEmoji(processedMessage);
+                    processedMessage = nerPersonFilter.capitalizeNamedEntities(processedMessage);
+                    processedMessage = nerLocationFilter.capitalizeNamedEntities(processedMessage);
+                    processedMessage = SpaceFilter.deleteSpace(processedMessage);
 
                     processedMessage = name + ": " + processedMessage;
                     sendMsgForAll(processedMessage);
@@ -160,26 +147,6 @@ public class Server {
                 e.printStackTrace();
                 LOGGER.error("Error closing connections!");
             }
-        }
-    }
-
-    private static String replaceSymbol(String badword) {
-        Random random = new Random();
-        int index = random.nextInt(badword.length());
-        return badword.replaceFirst(badword.substring(index, index + 1), "(•_•)");
-    }
-
-    private String validateMessage(String message) {
-        if (Pattern.matches(".*\\p{InCyrillic}.*", message)) {
-            return "Cyrillic message which we can't show";
-        } else {
-            String modifiedMessage = message;
-            for (String badword : taboo) {
-                if (modifiedMessage.contains(badword)) {
-                    modifiedMessage = modifiedMessage.replace(badword, replaceSymbol(badword));
-                }
-            }
-            return modifiedMessage;
         }
     }
 }
