@@ -28,19 +28,17 @@ public class BaseNERFilter {
     }
 
     public String capitalizeNamedEntities(String str) {
+        // these tokens will be capitalized for NER
         String[] tokens = sentenceTokenizer.tokenize(str);
         String[] tokensOriginal = tokens.clone();
 
+        // capitalize for NER because it works very bad with lower case named entities
         for (int i = 0; i < tokens.length; i++) {
             tokens[i] = capitalize(tokens[i]);
         }
 
         Span[] nerSpans = nameFinder.find(tokens);
-
-        for (int i = 1; i < tokens.length; i++) {
-            tokens[i] = tokens[i].toLowerCase();
-        }
-
+        // capitalize named entities and first word in the message
         tokensOriginal[0] = capitalize(tokensOriginal[0]);
         for (Span s: nerSpans) {
             for (int i = s.getStart(); i < s.getEnd(); i++) {
@@ -49,8 +47,8 @@ public class BaseNERFilter {
         }
 
         String result = "";
-
         for (String token: tokensOriginal) {
+            // to avoid space before punctuation
             if (Pattern.matches("\\p{Punct}", token)) {
                 result = result + token;
             }
