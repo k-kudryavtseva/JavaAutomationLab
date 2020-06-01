@@ -12,7 +12,7 @@ public class CensorialFilter implements IFilter {
     private static final String PATH_TO_BAD_WORDS = System.getProperty("user.dir") + "/src/main/java/autolab/censorialchat/swearwords.txt";
 
     public static void readBadWords() {
-        taboo = new HashSet<String>();
+        taboo = new HashSet<>();
         try (FileReader reader = new FileReader(PATH_TO_BAD_WORDS);
              BufferedReader bufferedReader = new BufferedReader(reader))
         {

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 
-public abstract class BaseNERFilter implements IFilter{
+public class BaseNERFilter implements IFilter {
 
     InputStream inputStream;
     TokenNameFinderModel model;

@@ -5,9 +5,9 @@ import java.io.IOException;
 
 public class NERPersonFilter extends BaseNERFilter{
 
-    private static final String pathToModel = System.getProperty("user.dir") + "/OpenNLP_models/en-ner-person.bin";
+    private static final String PATH_TO_MODEL = System.getProperty("user.dir") + "/OpenNLP_models/en-ner-person.bin";
 
     public NERPersonFilter() throws IOException {
-        super(pathToModel);
+        super(PATH_TO_MODEL);
     }
 }

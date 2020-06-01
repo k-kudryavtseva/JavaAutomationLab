@@ -16,9 +16,10 @@ public class Server {
     private final static int PORT = 8001;
     private NERPersonFilter nerPersonFilter;
     private NERLocationFilter nerLocationFilter;
-    private static CensorialFilter censorialFilter = new CensorialFilter();
-    private static EmojiFilter emojiFilter = new EmojiFilter();
-    private static SpaceFilter spaceFilter = new SpaceFilter();
+    private CensorialFilter censorialFilter;
+    private EmojiFilter emojiFilter;
+    private SpaceFilter spaceFilter;
+    private ArrayList<IFilter> filtersList;
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
@@ -31,8 +32,19 @@ public class Server {
 
     public Server() {
         try {
+
             nerPersonFilter = new NERPersonFilter();
             nerLocationFilter = new NERLocationFilter();
+            censorialFilter = new CensorialFilter();
+            emojiFilter  = new EmojiFilter();
+            spaceFilter = new SpaceFilter();
+            filtersList = new ArrayList<>();
+            filtersList.add(censorialFilter);
+            filtersList.add(emojiFilter);
+            filtersList.add(nerPersonFilter);
+            filtersList.add(nerLocationFilter);
+            filtersList.add(spaceFilter);
+
             server = new ServerSocket(PORT);
             LOGGER.info("server up");
 
@@ -102,11 +114,10 @@ public class Server {
                     if (str.equalsIgnoreCase("quit")) break;
 
                     String processedMessage = str;
-                    processedMessage = censorialFilter.filter(processedMessage);
-                    processedMessage = emojiFilter.filter(processedMessage);
-                    processedMessage = nerPersonFilter.filter(processedMessage);
-                    processedMessage = nerLocationFilter.filter(processedMessage);
-                    processedMessage = spaceFilter.filter(processedMessage);
+
+                    for (IFilter filterObj : filtersList) {
+                        processedMessage = filterObj.filter(processedMessage);
+                    }
 
                     processedMessage = name + ": " + processedMessage;
                     sendMsgForAll(processedMessage);
