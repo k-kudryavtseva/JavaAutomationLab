@@ -14,10 +14,10 @@ import java.util.Scanner;
 import java.util.UUID;
 
 
-public class Client {
+public class Client implements Runnable {
     private final static Logger LOGGER = Logger.getLogger(Client.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         BasicConfigurator.configure();
         new Client();
     }
@@ -30,36 +30,11 @@ public class Client {
     private PrintWriter out;
     private final Scanner scanner;
 
-    public Client(){
+    public Client() {
         this.scanner = new Scanner(System.in);
 
         HOST = PropertyUtil.getValueByKey(C10Constant.HOSTNAME);
         PORT = Integer.parseInt(PropertyUtil.getValueByKey(C10Constant.PORT));
-
-        UUID uuid = UUID.randomUUID();
-
-        try {
-            try {
-                initClient();
-
-                out.println(uuid.toString());
-
-                Listener listener = new Listener();
-                listener.start();
-
-                String str = "";
-                while (!str.equalsIgnoreCase("quit")) {
-                    str = scanner.nextLine();
-                    out.println(str);
-                }
-
-            } finally {
-                close();
-            }
-        } catch (IOException e){
-            LOGGER.error("Something went wrong. Reload chat");
-            e.printStackTrace();
-        }
     }
 
     private void initClient() throws IOException {
@@ -80,6 +55,33 @@ public class Client {
         } catch (IOException e) {
             LOGGER.error("Error closing connections");
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+
+        UUID uuid = UUID.randomUUID();
+
+        try {
+
+            initClient();
+
+            out.println(uuid.toString());
+
+            Listener listener = new Listener();
+            listener.start();
+
+            String str = "";
+            while (!str.equalsIgnoreCase("quit")) {
+                str = scanner.nextLine();
+                out.println(str);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            close();
         }
     }
 
