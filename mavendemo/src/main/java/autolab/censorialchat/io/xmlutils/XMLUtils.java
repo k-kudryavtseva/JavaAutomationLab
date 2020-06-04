@@ -1,7 +1,10 @@
 package autolab.censorialchat.io.xmlutils;
 
 
+import autolab.censorialchat.classes.c10.Client;
 import autolab.censorialchat.classes.c10.Message;
+import autolab.censorialchat.classes.c10.MultithreadedServer;
+import autolab.censorialchat.classes.c10.Server;
 
 import javax.xml.bind.JAXBException;
 import java.io.BufferedReader;
@@ -24,16 +27,21 @@ public class XMLUtils {
         return (Message) xmlUnmarshaller.getUnmarshalledXml(msg);
     }
 
-    public static String initMessageOut(String msg, MultiThreadedSocketServer multiThreadedSocketServer){
-        Message messageOut = new Message();
-        messageOut.setPort(multiThreadedSocketServer.getServer().getLocalPort());
-        messageOut.setHost(multiThreadedSocketServer.getServer().getLocalSocketAddress().toString());
-        messageOut.setMsg(msg);
-        messageOut.setToken(TokenGenerator.getAlphaNumericString(20));
-        messageOut.setDate(new Date());
+    public static String initMessageOut(String msg, MultithreadedServer multiThreadedServer){
+        return initMessageOut(msg, multiThreadedServer.getServer());
+    }
+
+    public static String initMessageOut(String msg, Server server){
+        Message messageOut = new Message(
+                Server.getHOST(),
+                Server.getPORT(),
+                Server.getTOKEN(),
+                msg,
+                new Date()
+        );
 
         try {
-            return multiThreadedSocketServer.getXmlMarshaller().getXml(messageOut);
+            return Server.getXmlMarshaller().getXml(messageOut);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
@@ -41,16 +49,18 @@ public class XMLUtils {
         return "ERROR";
     }
 
-    public static String initMessageOut(String msg, MultiThreadedSocketClient multiThreadedSocketClient){
-        Message messageOut = new Message();
-        messageOut.setPort(multiThreadedSocketClient.getPORT());
-        messageOut.setHost(multiThreadedSocketClient.getIP());
-        messageOut.setMsg(msg);
-        messageOut.setToken(TokenGenerator.getAlphaNumericString(20));
-        messageOut.setDate(new Date());
+    public static String initMessageOut(String msg, Client client){
+
+        Message messageOut = new Message(
+                client.getHOST(),
+                client.getPORT(),
+                client.getTOKEN(),
+                msg,
+                new Date()
+        );
 
         try {
-            return multiThreadedSocketClient.getXmlMarshaller().getXml(messageOut);
+            return Client.getXmlMarshaller().getXml(messageOut);
         } catch (JAXBException e) {
             e.printStackTrace();
         }

@@ -17,12 +17,16 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.UUID;
 
+import static autolab.censorialchat.io.xmlutils.XMLUtils.*;
+
 
 public class Client implements Runnable {
     private final static Logger LOGGER = Logger.getLogger(Client.class);
 
     private static XMLMarshaller xmlMarshaller;
     private static XMLUnmarshaller xmlUnmarshaller;
+
+    private UUID uuid;
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
@@ -31,25 +35,43 @@ public class Client implements Runnable {
 
     private final String HOST;
     private final int PORT;
+    private final String TOKEN;
 
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     private final Scanner scanner;
 
+    public int getPORT() {
+        return PORT;
+    }
+
+    public String getHOST() {
+        return HOST;
+    }
+
+    public String getTOKEN() {
+        return TOKEN;
+    }
+
+    public static XMLMarshaller getXmlMarshaller() {
+        return xmlMarshaller;
+    }
+
     public Client() {
         this.scanner = new Scanner(System.in);
 
         HOST = PropertyUtil.getValueByKey(C10Constant.HOSTNAME);
         PORT = Integer.parseInt(PropertyUtil.getValueByKey(C10Constant.PORT));
+        TOKEN = PropertyUtil.getValueByKey(C10Constant.TOKEN);
 
-        UUID uuid = UUID.randomUUID();
+        uuid = UUID.randomUUID();
 
         try {
             try {
                 initClient();
 
-                out.println(uuid.toString());
+                //out.println(uuid.toString());
 
                 Listener listener = new Listener();
                 listener.start();
@@ -57,7 +79,8 @@ public class Client implements Runnable {
                 String str = "";
                 while (!str.equalsIgnoreCase("quit")) {
                     str = scanner.nextLine();
-                    out.println(str);
+                    //out.println(str);
+                    out.println(initMessageOut(str, this));
                 }
 
             } finally {
@@ -78,7 +101,8 @@ public class Client implements Runnable {
         xmlMarshaller = new XMLMarshaller(context);
         xmlUnmarshaller = new XMLUnmarshaller(context);
 
-        String msg = initMessageOut(scanner.nextLine(), this);
+        String msg = initMessageOut(uuid.toString(), this);
+        out.println(msg);
 
         LOGGER.info(String.format("Connected to %s:%s", this.HOST, this.PORT));
     }
@@ -106,7 +130,7 @@ public class Client implements Runnable {
 
             initClient();
 
-            out.println(uuid.toString());
+            //out.println(uuid.toString());
 
             Listener listener = new Listener();
             listener.start();
@@ -114,7 +138,8 @@ public class Client implements Runnable {
             String str = "";
             while (!str.equalsIgnoreCase("quit")) {
                 str = scanner.nextLine();
-                out.println(str);
+                //out.println(str);
+                out.println(initMessageOut(str, this));
             }
 
         } catch (IOException | JAXBException e) {
@@ -135,10 +160,11 @@ public class Client implements Runnable {
         public void run() {
             try {
                 while (!stop) {
-                    String str = in.readLine();
+                    //String str = in.readLine();
+                    String str = getMessageIn(readXml(in), xmlUnmarshaller).getMsg();
                     LOGGER.info(str);
                 }
-            } catch (IOException e) {
+            } catch (IOException | JAXBException e) {
                 setStop();
                 e.printStackTrace();
             }

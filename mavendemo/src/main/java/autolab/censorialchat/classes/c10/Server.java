@@ -1,24 +1,36 @@
 package autolab.censorialchat.classes.c10;
 
+import autolab.censorialchat.constant.C10Constant;
 import autolab.censorialchat.filters.*;
-import org.apache.log4j.Logger;
+import autolab.censorialchat.io.xmlutils.XMLMarshaller;
+import autolab.censorialchat.io.xmlutils.XMLUnmarshaller;
+import autolab.censorialchat.util.PropertyUtil;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
-import java.io.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import static autolab.censorialchat.io.xmlutils.XMLUtils.*;
 
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
-    private final static String HOST = "127.0.0.1";
-    private final static int PORT = 8001;
-    private NERPersonFilter nerPersonFilter;
-    private NERLocationFilter nerLocationFilter;
-    private CensorialFilter censorialFilter;
-    private EmojiFilter emojiFilter;
-    private SpaceFilter spaceFilter;
+    private final static String HOST = PropertyUtil.getValueByKey(C10Constant.HOSTNAME);
+    private final static int PORT = Integer.parseInt(PropertyUtil.getValueByKey(C10Constant.PORT));
+    private final static String TOKEN = PropertyUtil.getValueByKey(C10Constant.TOKEN);
     private ArrayList<IFilter> filtersList;
+    private static XMLMarshaller xmlMarshaller;
+    private static XMLUnmarshaller xmlUnmarshaller;
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
@@ -26,32 +38,48 @@ public class Server {
     }
 
     private final List<Connection> connections = Collections.synchronizedList(new ArrayList<>());
-    private final List<String> chatHistory = Collections.synchronizedList(new ArrayList<>());
+    private final List<Message> chatHistory = Collections.synchronizedList(new ArrayList<>());
     private ServerSocket server;
 
     public List<Connection> getConnections() {
         return connections;
     }
 
+    public static String getTOKEN() {
+        return TOKEN;
+    }
+
+    public static int getPORT() {
+        return PORT;
+    }
+
+    public static String getHOST() {
+        return HOST;
+    }
+
+    public static XMLMarshaller getXmlMarshaller() {
+        return xmlMarshaller;
+    }
+
     public Server() {
         try {
 
-            nerPersonFilter = new NERPersonFilter();
-            nerLocationFilter = new NERLocationFilter();
-            censorialFilter = new CensorialFilter();
-            emojiFilter  = new EmojiFilter();
-            spaceFilter = new SpaceFilter();
+            JAXBContext context = JAXBContext.newInstance(Message.class);
+            xmlMarshaller = new XMLMarshaller(context);
+            xmlUnmarshaller = new XMLUnmarshaller(context);
+
             filtersList = new ArrayList<>();
-            filtersList.add(censorialFilter);
-            filtersList.add(emojiFilter);
-            filtersList.add(nerPersonFilter);
-            filtersList.add(nerLocationFilter);
-            filtersList.add(spaceFilter);
+            filtersList.add(new EmojiFilter());
+            filtersList.add(new NERPersonFilter());
+            filtersList.add(new NERLocationFilter());
+            filtersList.add(new CensorialFilter());
+            filtersList.add(new SpaceFilter());
+            filtersList.add(new CapitalizeFilter());
 
             server = new ServerSocket(PORT);
 
             CensorialFilter.readBadWords();
-        } catch (IOException e) {
+        } catch (IOException | JAXBException e) {
             e.printStackTrace();
         }
     }
@@ -63,7 +91,7 @@ public class Server {
             while (true) {
                 Socket socket = server.accept();
 
-                Connection connection = new Connection(socket);
+                Connection connection = new Connection(socket, this);
                 connections.add(connection);
                 connection.start();
             }
@@ -94,11 +122,13 @@ public class Server {
         private BufferedReader in;
         private PrintWriter out;
         private final Socket socket;
+        private final Server server;
 
         private String name = "";
 
-        public Connection(Socket socket) {
+        public Connection(Socket socket, Server server) {
             this.socket = socket;
+            this.server = server;
 
             try {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -113,14 +143,21 @@ public class Server {
         public void run() {
             try {
 
-                name = in.readLine();
+                //name = in.readLine();
+                name = getMessageIn(readXml(in), xmlUnmarshaller).getMsg();
                 sendMsgForAll(name + " connected");
+
+                chatHistory.sort(Comparator.comparing(Message::getDate));
 
                 sendChatHistory();
 
                 String str = "";
                 while (true) {
-                    str = in.readLine();
+                    //str = in.readLine();
+
+                    Message msgIn = getMessageIn(readXml(in), xmlUnmarshaller);
+                    str = msgIn.getMsg();
+
                     if (str.equalsIgnoreCase("quit")) break;
 
                     String processedMessage = str;
@@ -129,13 +166,16 @@ public class Server {
                         processedMessage = filterObj.filter(processedMessage);
                     }
 
-                    processedMessage = name + ": " + processedMessage;
+                    processedMessage = msgIn.getDate().toString() + " " + name + ": " + processedMessage;
                     sendMsgForAll(processedMessage);
-                    chatHistory.add(processedMessage);
+
+                    msgIn.setMsg(processedMessage);
+
+                    chatHistory.add(msgIn);
                 }
 
-                sendMsgForAll(name + ": " + "disconnected");
-            } catch (IOException e) {
+                sendMsgForAll(name + ": disconnected");
+            } catch (IOException | JAXBException e) {
                 e.printStackTrace();
             } finally {
                 close();
@@ -144,8 +184,8 @@ public class Server {
         
         private void sendChatHistory() {
             //chatHistory.forEach(historyMsg -> out.println(historyMsg));
-            for (String str: chatHistory) {
-                out.println(str);
+            for (Message msg: chatHistory) {
+                out.println(initMessageOut(msg.getMsg(), server));
             }
         }
 
@@ -155,7 +195,7 @@ public class Server {
 
             synchronized (connections) {
                 for (Connection connection : connections) {
-                    connection.out.println(message);
+                    connection.out.println(initMessageOut(message, server));
                 }
             }
         }
