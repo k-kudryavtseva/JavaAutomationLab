@@ -1,10 +1,14 @@
 package autolab.censorialchat.classes.c10;
 
 import autolab.censorialchat.constant.C10Constant;
+import autolab.censorialchat.io.xmlutils.XMLMarshaller;
+import autolab.censorialchat.io.xmlutils.XMLUnmarshaller;
 import autolab.censorialchat.util.PropertyUtil;
-import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,7 +21,10 @@ import java.util.UUID;
 public class Client implements Runnable {
     private final static Logger LOGGER = Logger.getLogger(Client.class);
 
-    public static void main(String[] args) throws IOException {
+    private static XMLMarshaller xmlMarshaller;
+    private static XMLUnmarshaller xmlUnmarshaller;
+
+    public static void main(String[] args) {
         BasicConfigurator.configure();
         new Client();
     }
@@ -35,12 +42,44 @@ public class Client implements Runnable {
 
         HOST = PropertyUtil.getValueByKey(C10Constant.HOSTNAME);
         PORT = Integer.parseInt(PropertyUtil.getValueByKey(C10Constant.PORT));
+
+        UUID uuid = UUID.randomUUID();
+
+        try {
+            try {
+                initClient();
+
+                out.println(uuid.toString());
+
+                Listener listener = new Listener();
+                listener.start();
+
+                String str = "";
+                while (!str.equalsIgnoreCase("quit")) {
+                    str = scanner.nextLine();
+                    out.println(str);
+                }
+
+            } finally {
+                close();
+            }
+        } catch (IOException | JAXBException e){
+            LOGGER.error("Something went wrong. Reload chat");
+            e.printStackTrace();
+        }
     }
 
-    private void initClient() throws IOException {
+    private void initClient() throws IOException, JAXBException {
         this.socket = new Socket(this.HOST, this.PORT);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out = new PrintWriter(socket.getOutputStream(), true);
+
+        JAXBContext context = JAXBContext.newInstance(Message.class);
+        xmlMarshaller = new XMLMarshaller(context);
+        xmlUnmarshaller = new XMLUnmarshaller(context);
+
+        String msg = initMessageOut(scanner.nextLine(), this);
+
         LOGGER.info(String.format("Connected to %s:%s", this.HOST, this.PORT));
     }
 
@@ -78,7 +117,7 @@ public class Client implements Runnable {
                 out.println(str);
             }
 
-        } catch (IOException e) {
+        } catch (IOException | JAXBException e) {
             e.printStackTrace();
         } finally {
             close();
