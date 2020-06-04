@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class);
     private final static String HOST = "127.0.0.1";
@@ -23,12 +22,16 @@ public class Server {
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
-        new Server();
+        new Server().startServer();
     }
 
     private final List<Connection> connections = Collections.synchronizedList(new ArrayList<>());
     private final List<String> chatHistory = Collections.synchronizedList(new ArrayList<>());
     private ServerSocket server;
+
+    public List<Connection> getConnections() {
+        return connections;
+    }
 
     public Server() {
         try {
@@ -46,9 +49,16 @@ public class Server {
             filtersList.add(spaceFilter);
 
             server = new ServerSocket(PORT);
-            LOGGER.info("server up");
 
             CensorialFilter.readBadWords();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startServer() {
+        try {
+            LOGGER.info("server up");
 
             while (true) {
                 Socket socket = server.accept();
