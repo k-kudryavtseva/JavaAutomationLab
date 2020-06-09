@@ -8,9 +8,18 @@ public class MultithreadedServer extends Thread {
     public MultithreadedServer() {
     }
 
+    public Server getServer() {
+        return server;
+    }
+
     @Override
     public void run() {
-        server.startServer();
+        //server.startServer();
+        try {
+            server.listen();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<Server.Connection> getConnections() {

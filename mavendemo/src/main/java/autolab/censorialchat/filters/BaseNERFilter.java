@@ -39,7 +39,6 @@ public class BaseNERFilter implements IFilter {
 
         Span[] nerSpans = nameFinder.find(tokens);
         // capitalize named entities and first word in the message
-        tokensOriginal[0] = capitalize(tokensOriginal[0]);
         for (Span s: nerSpans) {
             for (int i = s.getStart(); i < s.getEnd(); i++) {
                 tokensOriginal[i] = capitalize(tokensOriginal[i]);

@@ -37,8 +37,9 @@ public class CensorialFilter implements IFilter {
         } else {
             String modifiedMessage = message;
             for (String badword : taboo) {
-                if (modifiedMessage.contains(badword)) {
-                    modifiedMessage = modifiedMessage.replace(badword, replaceSymbol(badword));
+                if (modifiedMessage.toLowerCase().contains(badword.toLowerCase())) {
+                    //modifiedMessage = modifiedMessage.replace(badword, replaceSymbol(badword));
+                    modifiedMessage = modifiedMessage.replaceAll("(?i)" + badword.toLowerCase(), replaceSymbol(badword));
                 }
             }
             return modifiedMessage;
