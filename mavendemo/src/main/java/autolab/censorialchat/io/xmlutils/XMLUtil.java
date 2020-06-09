@@ -11,7 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Date;
 
-public class XMLUtils {
+public class XMLUtil {
 
     public static String readXml(BufferedReader in) throws IOException {
         StringBuilder xml = new StringBuilder();

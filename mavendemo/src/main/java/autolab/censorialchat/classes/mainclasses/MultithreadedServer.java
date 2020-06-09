@@ -14,7 +14,12 @@ public class MultithreadedServer extends Thread {
 
     @Override
     public void run() {
-        server.startServer();
+        //server.startServer();
+        try {
+            server.listen();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<Server.Connection> getConnections() {
