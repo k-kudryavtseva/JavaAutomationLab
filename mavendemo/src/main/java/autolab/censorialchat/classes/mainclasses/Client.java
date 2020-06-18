@@ -1,4 +1,4 @@
-package autolab.censorialchat.classes.c10;
+package autolab.censorialchat.classes.mainclasses;
 
 import autolab.censorialchat.config.ClientConfig;
 import autolab.censorialchat.config.configurator.BaseConfigurator;
@@ -55,17 +55,11 @@ public class Client implements Runnable {
     public Client() {
         this.scanner = new Scanner(System.in);
 
-//        HOST = PropertyUtil.getValueByKey(ConfigConstant.HOSTNAME);
-//        PORT = Integer.parseInt(PropertyUtil.getValueByKey(ConfigConstant.PORT));
-//        TOKEN = PropertyUtil.getValueByKey(ConfigConstant.TOKEN);
-
         uuid = UUID.randomUUID();
 
         try {
             try {
                 initClient();
-
-                //out.println(uuid.toString());
 
                 Listener listener = new Listener();
                 listener.start();
@@ -99,17 +93,10 @@ public class Client implements Runnable {
     }
 
     private void initClient() throws IOException, JAXBException, UnableToWriteException {
-        // this.socket = new Socket(this.HOST, this.PORT);
-
-        //this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        //this.out = new PrintWriter(socket.getOutputStream(), true);
 
         JAXBContext context = JAXBContext.newInstance(Message.class);
         xmlMarshaller = new XMLMarshaller(context);
         xmlUnmarshaller = new XMLUnmarshaller(context);
-
-        //String msg = initMessageOut(uuid.toString(), this);
-        //out.println(msg);
 
         Message msg = new Message(HOST, PORT, TOKEN, uuid.toString(), new Date());
         writeMessage(msg, uuid.toString());
@@ -118,11 +105,6 @@ public class Client implements Runnable {
     }
 
     private void close(){
-        //if (socket != null){
-        //    socket.close();
-        //}
-        //in.close();
-        //out.close();
         File clientFile = new File(PATH_TO_PUSH + IOConstant.PATH_SEPARATOR + uuid.toString() + IOConstant.XML);
         clientFile.delete();
         System.exit(-1);
@@ -135,16 +117,12 @@ public class Client implements Runnable {
 
             initClient();
 
-            //out.println(uuid.toString());
-
             Listener listener = new Listener();
             listener.start();
 
             String str = "";
             while (!str.equalsIgnoreCase("quit")) {
                 str = scanner.nextLine();
-                //out.println(str);
-                //out.println(initMessageOut(str, this));
 
                 Message msg = new Message(HOST, PORT, TOKEN, str, new Date());
                 writeMessage(msg, uuid.toString());
@@ -163,22 +141,5 @@ public class Client implements Runnable {
         public void setStop() {
             stop = true;
         }
-
-//        @Override
-//        public void run() {
-//            try {
-//                while (!stop) {
-//                    //String str = in.readLine();
-//                    //String str = getMessageIn(readXml(in), xmlUnmarshaller).getMsg();
-//
-//                    //Message msg = XMLUtil.readMessage(PATH_TO_PUSH + IOConstant.PATH_SEPARATOR + uuid.toString() + IOConstant.XML);
-//                    //LOGGER.info(msg.getMsg());
-//                    Thread.sleep(30000);
-//                }
-//            } catch (IOException | JAXBException | InterruptedException e) {
-//                setStop();
-//                e.printStackTrace();
-//            }
-//        }
     }
 }

@@ -1,4 +1,4 @@
-package autolab.censorialchat.classes.c10;
+package autolab.censorialchat.classes.mainclasses;
 
 import autolab.censorialchat.config.ServerConfig;
 import autolab.censorialchat.config.configurator.BaseConfigurator;
@@ -32,7 +32,6 @@ public class Server {
 
     public static void main(String[] args) throws InterruptedException {
         BasicConfigurator.configure();
-        //new Server().startServer();
         initFilters();
         listen();
     }
@@ -83,8 +82,6 @@ public class Server {
             filterList.add(new SpaceFilter());
             filterList.add(new CapitalizeFilter());
 
-            //server = new ServerSocket(PORT);
-
             CensorialFilter.readBadWords();
         } catch (IOException | JAXBException e) {
             e.printStackTrace();
@@ -98,26 +95,7 @@ public class Server {
     public Server() {
     }
 
-//    public void startServer() {
-//        try {
-//            LOGGER.info("server up");
-//
-//            while (true) {
-//                Socket socket = server.accept();
-//
-//                Connection connection = new Connection();
-//                connections.add(connection);
-//                connection.start();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            closeAll();
-//            LOGGER.info("server down");
-//        }
-//    }
-
-    static void listen() throws InterruptedException{
+    static void listen() throws InterruptedException {
 
         LOGGER.info("server up");
 
@@ -132,165 +110,56 @@ public class Server {
                     conn.run();
                 }
             }
-            //LOGGER.info("Active threads : ".concat(String.valueOf(Thread.activeCount())));
-            //LOGGER.info("History now is : ".concat(chatHistory.toString()));
             Thread.sleep(10000);
         }
     }
 
-//    private void closeAll() {
-//        try {
-//            server.close();
-//
-//            synchronized (connections) {
-//                for (Connection connection : connections) {
-//                    connection.close();
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            LOGGER.error("Error closing connections!");
-//        }
-//    }
+    static class Connection extends Thread {
 
-//    public class Connection extends Thread {
-//        private BufferedReader in;
-//        private PrintWriter out;
-//        private final Socket socket;
-//        private final Server server;
-//
-//        private String name = "";
-//
-//        public Connection(Socket socket, Server server) {
-//            this.socket = socket;
-//            this.server = server;
-//
-//            try {
-//                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//                out = new PrintWriter(socket.getOutputStream(), true);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                close();
-//            }
-//        }
-//
-//        @Override
-//        public void run() {
-//            try {
-//
-//                //name = in.readLine();
-//                name = getMessageIn(readXml(in), xmlUnmarshaller).getMsg();
-//                sendMsgForAll(name + " connected");
-//
-//                chatHistory.sort(Comparator.comparing(Message::getDate));
-//
-//                sendChatHistory();
-//
-//                String str = "";
-//                while (true) {
-//                    //str = in.readLine();
-//
-//                    Message msgIn = getMessageIn(readXml(in), xmlUnmarshaller);
-//                    str = msgIn.getMsg();
-//
-//                    if (str.equalsIgnoreCase("quit")) break;
-//
-//                    String processedMessage = str;
-//
-//                    for (IFilter filterObj : filtersList) {
-//                        processedMessage = filterObj.filter(processedMessage);
-//                    }
-//
-//                    processedMessage = msgIn.getDate().toString() + " " + name + ": " + processedMessage;
-//                    sendMsgForAll(processedMessage);
-//
-//                    msgIn.setMsg(processedMessage);
-//
-//                    chatHistory.add(msgIn);
-//                }
-//
-//                sendMsgForAll(name + ": disconnected");
-//            } catch (IOException | JAXBException e) {
-//                e.printStackTrace();
-//            } finally {
-//                close();
-//            }
-//        }
+        private String path;
+        private List<IFilter> filterList;
 
-        static class Connection extends Thread {
+        public Connection(String path, List<IFilter> filterList) {
+            this.path = path;
+            this.filterList = filterList;
+        }
 
-            private String path;
-            private List<IFilter> filterList;
+        public void run() {
+            try {
+                Message msg = readMessage(path);
+                if (msg != null) {
+                    File file = new File(path);
+                    file.delete();
 
-            public Connection(String path, List<IFilter> filterList) {
-                this.path = path;
-                this.filterList = filterList;
-            }
+                    String processedMessage = msg.getMsg();
 
-            public void run() {
-                try {
-
-                    Message msg = readMessage(path);
-                    if (msg != null) {
-                        File file = new File(path);
-                        file.delete();
-
-                        String processedMessage = msg.getMsg();
-
-                        if (processedMessage.equalsIgnoreCase("quit")) {
-                            processedMessage = "Somebody quitted";
-                        } else {
-                            for (IFilter filterObj : filterList) {
-                                processedMessage = filterObj.filter(processedMessage);
-                            }
-
-                            processedMessage = msg.getDate().toString() + ": " + processedMessage;
+                    if (processedMessage.equalsIgnoreCase("quit")) {
+                        processedMessage = "Somebody quitted";
+                    } else {
+                        for (IFilter filterObj : filterList) {
+                            processedMessage = filterObj.filter(processedMessage);
                         }
 
-                        LOGGER.info(processedMessage);
-                        msg.setMsg(processedMessage);
-                        chatHistory.add(msg);
+                        processedMessage = msg.getDate().toString() + ": " + processedMessage;
                     }
-                } catch (UnableToReadException e) {
-                    e.printStackTrace();
-                    currentThread().interrupt();
+
+                    LOGGER.info(processedMessage);
+                    msg.setMsg(processedMessage);
+                    chatHistory.add(msg);
                 }
-            }
-
-        }
-
-        private static Message readMessage(String pathTo) throws UnableToReadException {
-            try {
-                return XMLUtil.readMessage(pathTo);
-            } catch (JAXBException | FileNotFoundException e) {
+            } catch (UnableToReadException e) {
                 e.printStackTrace();
-                //throw new UnableToReadException("Something went wrong while reading!");
-                return null;
+                currentThread().interrupt();
             }
         }
-//        private void sendChatHistory() {
-//            //chatHistory.forEach(historyMsg -> out.println(historyMsg));
-//            for (Message msg: chatHistory) {
-//                out.println(initMessageOut(msg.getMsg(), server));
-//            }
-//        }
-
-//        private void sendMsgForAll(String message) {
-//
-//            LOGGER.info(message);
-//
-//            synchronized (connections) {
-//                for (Connection connection : connections) {
-//                    //connection.out.println(initMessageOut(message, server));
-//                }
-//            }
-//        }
-
-//        public void close() {
-//            //socket.close();
-//            //in.close();
-//            //out.close();
-//
-//            connections.remove(this);
-//        }
     }
+
+    private static Message readMessage(String pathTo) throws UnableToReadException {
+        try {
+            return XMLUtil.readMessage(pathTo);
+        } catch (JAXBException | FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}

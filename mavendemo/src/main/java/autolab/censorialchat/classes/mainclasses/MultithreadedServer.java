@@ -1,4 +1,4 @@
-package autolab.censorialchat.classes.c10;
+package autolab.censorialchat.classes.mainclasses;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package autolab;
 
-import autolab.censorialchat.classes.c10.Client;
-import autolab.censorialchat.classes.c10.MultithreadedServer;
+import autolab.censorialchat.classes.mainclasses.Client;
+import autolab.censorialchat.classes.mainclasses.MultithreadedServer;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
