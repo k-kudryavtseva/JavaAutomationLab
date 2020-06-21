@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="message_mapper">
+    <select id="get" resultMap="message_map">
+        SELECT *
+        FROM messages
+    </select>
+    <select id="getFromDate" resultMap="message_map">
+        SELECT *
+        FROM messages
+        WHERE date > #{date}
+    </select>
+    <insert id="create">
+        INSERT INTO messages(uuid, input_message, date) VALUES(#{uuid}, #{msg}, #{date})
+    </insert>
+    <update id="update">
+        UPDATE messages SET output_message=#{msg} WHERE message_id=#{id}
+    </update>
+
+    <resultMap id="message_map" type="autolab.censorialchat.classes.mainclasses.Message" autoMapping="false">
+        <id property="id" column="message_id"/>
+        <result property="uuid" column="uuid"/>
+        <result property="msg" column="input_message"/>
+        <result property="processed_msg" column="output_message"/>
+        <result property="date" column="date"/>
+    </resultMap>
+</mapper>

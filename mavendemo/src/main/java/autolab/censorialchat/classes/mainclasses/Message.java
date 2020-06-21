@@ -8,28 +8,34 @@ import java.util.Date;
 
 @XmlType(name = "message")
 @XmlRootElement
-public class Message implements Comparable<Message>{
+public class Message implements Comparable<Message> {
 
-    public Message(){}
+    public Message() {}
 
-    public Message(String msg){
+    public Message(String msg) {
         this.msg = msg;
         this.date = new Date();
     }
 
-    public Message(String host, int port, String token, String msg, Date date){
+    public Message(String host, int port, String token, String msg, String uuid, Date date, int id, String processed_msg) {
         this.host = host;
         this.port = port;
         this.token = token;
         this.msg = msg;
+        this.uuid = uuid;
         this.date = date;
+        this.id = id;
+        this.processed_msg = processed_msg;
     }
 
     private String host;
     private int port;
     private String token;
     private String msg;
+    private String processed_msg;
     private Date date;
+    private String uuid;
+    private Integer id = null;
 
     @Override
     public int compareTo(Message message) {
@@ -82,6 +88,4 @@ public class Message implements Comparable<Message>{
     public String getToken() {
         return token;
     }
-
-
 }

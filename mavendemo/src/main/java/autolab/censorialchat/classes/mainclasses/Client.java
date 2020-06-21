@@ -3,6 +3,7 @@ package autolab.censorialchat.classes.mainclasses;
 import autolab.censorialchat.config.ClientConfig;
 import autolab.censorialchat.config.configurator.BaseConfigurator;
 import autolab.censorialchat.constant.IOConstant;
+import autolab.censorialchat.dao.impl.MessageDAOImpl;
 import autolab.censorialchat.io.exception.UnableToWriteException;
 import autolab.censorialchat.io.xmlutils.XMLMarshaller;
 import autolab.censorialchat.io.xmlutils.XMLUnmarshaller;
@@ -48,6 +49,8 @@ public class Client implements Runnable {
     private PrintWriter out;
     private final Scanner scanner;
 
+    MessageDAOImpl messageDAO = new MessageDAOImpl();
+
     public static XMLMarshaller getXmlMarshaller() {
         return xmlMarshaller;
     }
@@ -69,8 +72,9 @@ public class Client implements Runnable {
                     str = scanner.nextLine();
                     //out.println(str);
                     //out.println(initMessageOut(str, this));
-                    Message msg = new Message(HOST, PORT, TOKEN, str, new Date());
-                    writeMessage(msg, uuid.toString());
+                    Message msg = new Message(HOST, PORT, TOKEN, str, uuid.toString(), new Date(), 0, null);
+                    //writeMessage(msg, uuid.toString());
+                    messageDAO.create(msg);
                 }
 
             } finally {
@@ -98,8 +102,21 @@ public class Client implements Runnable {
         xmlMarshaller = new XMLMarshaller(context);
         xmlUnmarshaller = new XMLUnmarshaller(context);
 
-        Message msg = new Message(HOST, PORT, TOKEN, uuid.toString(), new Date());
-        writeMessage(msg, uuid.toString());
+        Message msg = new Message(
+                HOST,
+                PORT,
+                TOKEN,
+                String.format("%s client connected to %s:%s", uuid.toString(), HOST, PORT),
+                uuid.toString(),
+                new Date(),
+                0,
+                null
+        );
+        //writeMessage(msg, uuid.toString());
+
+        System.out.println("1");
+        messageDAO.create(msg);
+        System.out.println("1");
 
         LOGGER.info(String.format("Connected to %s:%s", HOST, PORT));
     }
@@ -124,8 +141,9 @@ public class Client implements Runnable {
             while (!str.equalsIgnoreCase("quit")) {
                 str = scanner.nextLine();
 
-                Message msg = new Message(HOST, PORT, TOKEN, str, new Date());
-                writeMessage(msg, uuid.toString());
+                Message msg = new Message(HOST, PORT, TOKEN, str, uuid.toString(), new Date(), 0, null);
+                //writeMessage(msg, uuid.toString());
+                messageDAO.create(msg);
             }
 
         } catch (IOException | JAXBException | UnableToWriteException e) {
