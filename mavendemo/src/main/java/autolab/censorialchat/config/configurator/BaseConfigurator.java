@@ -4,8 +4,8 @@ import autolab.censorialchat.config.ClientConfig;
 import autolab.censorialchat.config.ServerConfig;
 import autolab.censorialchat.constant.ConfigConstant;
 import autolab.censorialchat.constant.SplitConstant;
-import autolab.censorialchat.io.exception.UnableToReadException;
-import autolab.censorialchat.io.exception.WrongConfigurationException;
+import autolab.censorialchat.exception.UnableToReadException;
+import autolab.censorialchat.exception.WrongConfigurationException;
 import autolab.censorialchat.util.PropertyArgResolver;
 import org.apache.log4j.Logger;
 

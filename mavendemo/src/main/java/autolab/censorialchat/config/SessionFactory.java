@@ -12,16 +12,16 @@ public class SessionFactory {
 
     public static final Logger LOGGER = Logger.getLogger(SessionFactory.class);
 
-    private static SqlSessionFactory sqlSessionFactory = null;
+    private static SqlSessionFactory sqlSessionFactory = null; // SQLSessionFactory - базовый класс для каждого приложения MyBatis
 
     static {
         try {
-            System.out.println('6');
+            System.out.println('2');
             String resource = "mybatisconfig.xml";
-            InputStream is  = Resources.getResourceAsStream(resource);
-            System.out.println(is);
-            sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
-            System.out.println('8');
+            InputStream inputStream  = Resources.getResourceAsStream(resource); // Читаем файл с настройками подключения и настройками MyBatis
+            System.out.println(inputStream);
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+            System.out.println('3');
         } catch (IOException e) {
             LOGGER.error(e);
         }
@@ -29,5 +29,5 @@ public class SessionFactory {
 
     public static SqlSession getSession(){
         return sqlSessionFactory.openSession();
-    }
+    } //
 }

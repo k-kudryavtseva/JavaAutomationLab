@@ -2,24 +2,37 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="message_mapper">
-    <select id="get" resultMap="message_map">
+<mapper namespace="message_mapper"> <!-- autolab.censorialchat.dao.MessageDAO-->
+    <select id="getMessageByID" resultMap="message_map"> <!--атрибут "id" содержит в себе имя запроса -->
+            SELECT *
+            FROM messages
+            WHERE message_id = #{id} <!-- поле в фигурных скобках это параметр, который прилетел в метод. Если это Map — то {имя} это ключ к переменной.-->
+    </select>
+    <select id="getLastMessageID" resultType="int">
+            SELECT MAX(message_id)
+            FROM messages
+    </select>
+    <select id="getMessage" resultMap="message_map">
         SELECT *
         FROM messages
     </select>
-    <select id="getFromDate" resultMap="message_map">
+    <select id="getMessageFromDate" resultMap="message_map">
         SELECT *
         FROM messages
         WHERE date > #{date}
     </select>
     <insert id="create">
-        INSERT INTO messages(uuid, input_message, date) VALUES(#{uuid}, #{msg}, #{date})
+        INSERT INTO messages(uuid, input_message, date)
+        VALUES(#{uuid}, #{msg}, #{date})
     </insert>
     <update id="update">
-        UPDATE messages SET output_message=#{msg} WHERE message_id=#{id}
+        UPDATE messages
+        SET output_message=#{processed_msg}
+        WHERE message_id=#{id}
     </update>
 
-    <resultMap id="message_map" type="autolab.censorialchat.classes.mainclasses.Message" autoMapping="false">
+    <resultMap id="message_map" type="autolab.censorialchat.classes.mainclasses.Message" autoMapping="false"> <!-- тег ResultMap позволяет настраивать произвольный мапинг. Делать связи one-to-one и one-to-many
+    ResultMap представляет из себя описание правил связи полей EntityBean с колонками из таблиц.-->
         <id property="id" column="message_id"/>
         <result property="uuid" column="uuid"/>
         <result property="msg" column="input_message"/>

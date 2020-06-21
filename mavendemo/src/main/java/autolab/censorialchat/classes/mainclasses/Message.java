@@ -52,17 +52,13 @@ public class Message implements Comparable<Message> {
         this.date = date;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
+    public void setMsg(String msg) { this.msg = msg; }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
+    public void setProcessed_msg(String msg) { this.processed_msg = msg; }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+    public void setPort(int port) { this.port = port; }
+
+    public void setToken(String token) { this.token = token; }
 
     @XmlElement(name = "host")
     public String getHost() {

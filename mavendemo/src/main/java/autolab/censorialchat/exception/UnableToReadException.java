@@ -1,4 +1,4 @@
-package autolab.censorialchat.io.exception;
+package autolab.censorialchat.exception;
 
 public class UnableToReadException extends Exception{
     public UnableToReadException(String message) {

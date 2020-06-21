@@ -6,10 +6,11 @@ import java.util.Date;
 import java.util.List;
 
 public interface MessageDAO {
-    void create(Message author);
-    Message getById(long id);
-    List<Message> get();
-    List<Message> getFromDate(Date date);
+    void create(Message message);
+    Message getMessageByID(int id); // возвращает одно сообщение по id
+    List<Message> getMessage(); // возвращает список сообщений
+    List<Message> getMessageFromDate(Date date); // возвращает список сообщений по дате
+    int getLastMessageID();
     void update(Message message);
-    void delete(long id);
+    void delete(int id);
 }

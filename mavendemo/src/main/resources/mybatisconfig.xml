@@ -3,13 +3,16 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-    <properties resource="config.properties">
+    <properties resource="config.properties"> <!--ссылка на файл, где находятся параметры конфигурации базы данных, приведенные ниже -->
         <property name="username" value="root" />
         <property name="password" value="Monblan4807" />
         <property name="url" value="jdbc:mysql://localhost:3306/chat_schema" />
         <property name="driver" value="com.mysql.jdbc.Driver" />
     </properties>
-    <environments default="development">
+    <settings> <!--в данном блоке можно настроить много параметров. Полный список параметров http://mybatis.github.io/mybatis-3/configuration.html#settings-->
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
+    <environments default="development"> <!--в данном блоке настраиваются подключения к БД-->
         <environment id="development">
             <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
@@ -20,7 +23,7 @@
             </dataSource>
         </environment>
     </environments>
-    <mappers>
-        <mapper resource="mappers/message_mapper.xml"/>
+    <mappers> <!--в данном блоке необходимо описать все маперы, которые используются в проекте-->
+        <mapper resource="mapper/message_mapper.xml"/> <!--путь к файлу с SQL запросами -->
     </mappers>
 </configuration>

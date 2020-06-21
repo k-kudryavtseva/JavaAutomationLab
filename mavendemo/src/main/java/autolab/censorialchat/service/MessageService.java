@@ -7,25 +7,25 @@ import autolab.censorialchat.dao.impl.MessageDAOImpl;
 import java.util.List;
 
 public class MessageService {
-    MessageDAO authorDAO = new MessageDAOImpl();
+    MessageDAO messageDAO = new MessageDAOImpl();
 
-    public Message getAuthorById(long id) {
-        return authorDAO.getById(id);
+    public Message getMessageById(int id) {
+        return messageDAO.getMessageByID(id);
     }
 
-    public List<Message> getAllAuthors() {
-        return authorDAO.get();
+    public List<Message> getAllMessages() {
+        return messageDAO.getMessage();
     }
 
-    public void createAuthor(Message author) {
-        authorDAO.create(author);
+    public void createMessage(Message message) {
+        messageDAO.create(message);
     }
 
-    public void deleteAuthorById(long id) {
-        authorDAO.delete(id);
+    public void deleteMessageById(int id) {
+        messageDAO.delete(id);
     }
 
-    public void updateAuthor(Message author) {
-        authorDAO.update(author);
+    public void updateMessage(Message message) {
+        messageDAO.update(message);
     }
 }

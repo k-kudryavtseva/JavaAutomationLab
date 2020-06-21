@@ -1,8 +1,8 @@
 package autolab.censorialchat.util;
 
 import autolab.censorialchat.constant.IOConstant;
-import autolab.censorialchat.io.exception.UnableToReadException;
-import autolab.censorialchat.io.exception.WrongConfigurationException;
+import autolab.censorialchat.exception.UnableToReadException;
+import autolab.censorialchat.exception.WrongConfigurationException;
 
 import java.io.File;
 import java.io.FileInputStream;
