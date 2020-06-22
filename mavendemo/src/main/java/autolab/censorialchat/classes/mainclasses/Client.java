@@ -4,24 +4,18 @@ import autolab.censorialchat.config.ClientConfig;
 import autolab.censorialchat.config.configurator.BaseConfigurator;
 import autolab.censorialchat.dao.impl.MessageDAOImpl;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 
 import java.util.Date;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class Client implements Runnable {
-    private final static Logger LOGGER = Logger.getLogger(Client.class);
-
-    private UUID uuid;
-
-    public static void main(String[] args) {
+public class Client {
+    public static void main(String[] args) throws InterruptedException {
         BasicConfigurator.configure();
         new Client();
     }
 
     private static ClientConfig config = init();
-
     private static ClientConfig init() {
         return BaseConfigurator.getInstance().clientConfig();
     }
@@ -32,12 +26,11 @@ public class Client implements Runnable {
     private static final String TOKEN = config.getToken();
 
     private final Scanner scanner;
-
+    private UUID uuid;
     MessageDAOImpl messageDAOImpl = new MessageDAOImpl();
 
-    public Client() {
+    public Client() throws InterruptedException {
         this.scanner = new Scanner(System.in);
-
         uuid = UUID.randomUUID();
 
         Listener listener = new Listener();
@@ -48,37 +41,9 @@ public class Client implements Runnable {
             str = scanner.nextLine();
             Message msg = new Message(HOST, PORT, TOKEN, str, uuid.toString(), new Date(), 0, null);
             messageDAOImpl.create(msg);
-        }
-    }
-
-    private void initClient() {
-
-        Message msg = new Message(
-                HOST,
-                PORT,
-                TOKEN,
-                String.format("%s client connected to %s:%s", uuid.toString(), HOST, PORT),
-                uuid.toString(),
-                new Date(),
-                0,
-                null
-        );
-
-        messageDAOImpl.create(msg);
-        LOGGER.info(String.format("Connected to %s:%s", HOST, PORT));
-    }
-
-    @Override
-    public void run() {
-
-        Listener listener = new Listener();
-        listener.start();
-
-        String str = "";
-        while (!str.equalsIgnoreCase("quit")) {
-            str = scanner.nextLine();
-            Message msg = new Message(HOST, PORT, TOKEN, str, uuid.toString(), new Date(), 0, null);
-            messageDAOImpl.create(msg);
+            Thread.sleep(10000);
+            Message processedmsg = messageDAOImpl.getMessageByID(messageDAOImpl.getLastMessageID());
+            System.out.println(processedmsg.getProcessedMsg());
         }
     }
 

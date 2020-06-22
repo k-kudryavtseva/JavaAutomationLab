@@ -4,13 +4,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="message_mapper"> <!-- autolab.censorialchat.dao.MessageDAO-->
     <select id="getMessageByID" resultMap="message_map"> <!--атрибут "id" содержит в себе имя запроса -->
-            SELECT *
-            FROM messages
-            WHERE message_id = #{id} <!-- поле в фигурных скобках это параметр, который прилетел в метод. Если это Map — то {имя} это ключ к переменной.-->
+        SELECT *
+        FROM messages
+        WHERE message_id = #{id} <!-- поле в фигурных скобках это параметр, который прилетел в метод. Если это Map — то {имя} это ключ к переменной.-->
     </select>
     <select id="getLastMessageID" resultType="int">
-            SELECT MAX(message_id)
-            FROM messages
+        SELECT MAX(message_id)
+        FROM messages
     </select>
     <select id="getMessage" resultMap="message_map">
         SELECT *

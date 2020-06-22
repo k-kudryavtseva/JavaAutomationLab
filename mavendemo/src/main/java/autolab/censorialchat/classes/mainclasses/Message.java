@@ -84,4 +84,9 @@ public class Message implements Comparable<Message> {
     public String getToken() {
         return token;
     }
+
+    @XmlElement(name = "processed_msg")
+    public String  getProcessedMsg() {
+        return processed_msg;
+    }
 }

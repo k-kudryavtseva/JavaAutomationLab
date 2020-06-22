@@ -6,7 +6,6 @@ import autolab.censorialchat.dao.MessageDAO;
 import org.apache.ibatis.session.SqlSession;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class MessageDAOImpl implements MessageDAO {
@@ -15,30 +14,18 @@ public class MessageDAOImpl implements MessageDAO {
 
     @Override
     public void create(Message message) {
-        System.out.println('1');
         SqlSession sqlSession = SessionFactory.getSession();
-        System.out.println('4');
         sqlSession.insert(namespace + ".create", message);
-        System.out.println('5');
         sqlSession.commit();
-        System.out.println('6');
         sqlSession.close();
-        System.out.println('7');
     }
 
     @Override
     public Message getMessageByID(int id) {
-        System.out.println("3333");
         SqlSession sqlSession = SessionFactory.getSession();
-
-        HashMap<String, Integer> m = new HashMap<>();
-        m.put("id", id);
-
-        Message a = sqlSession.selectOne(namespace + ".getMessageByID", m);
-        System.out.println("3334");
+        Message message = sqlSession.selectOne(namespace + ".getMessageByID", id);
         sqlSession.close();
-
-        return a;
+        return message;
     }
 
     @Override
@@ -63,7 +50,6 @@ public class MessageDAOImpl implements MessageDAO {
         SqlSession sqlSession = SessionFactory.getSession();
         int lastMessageID = sqlSession.selectOne(namespace + ".getLastMessageID");
         sqlSession.close();
-
         return lastMessageID;
     }
 
