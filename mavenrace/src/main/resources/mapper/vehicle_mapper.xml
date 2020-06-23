@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vehicle_mapper"> <!-- autolab.censorialchat.dao.MessageDAO-->
+    <insert id="createVehicle">
+        INSERT INTO vehicles(name, engine_type, wheel_type, mass, point)
+        VALUES(#{name}, #{engine_type}, #{wheel_type}, #{mass}, #{point})
+    </insert>
+
+    <resultMap id="engine_map" type="race.vehicle.Vehicle" autoMapping="false"> <!-- тег ResultMap позволяет настраивать произвольный мапинг. Делать связи one-to-one и one-to-many
+    ResultMap представляет из себя описание правил связи полей EntityBean с колонками из таблиц.-->
+        <id property="id" column="v_id"/>
+        <result property="name" column="name"/>
+        <result property="engine" column="engine_type"/>
+        <result property="wheel" column="wheel_type"/>
+        <result property="mass" column="mass"/>
+        <result property="point" column="point"/>
+    </resultMap>
+</mapper>

@@ -1,8 +1,7 @@
 package race.main;
 
+import race.dao.impl.VehicleDAOImpl;
 import race.engine.Engine;
-import race.engine.V4Engine;
-import race.engine.V8Engine;
 import race.exception.InvalidPointLocationException;
 import race.exception.InvalidVehiclePropertiesException;
 import race.ioutils.PropertyFileReader;
@@ -18,16 +17,15 @@ import race.wheel.LowProfileTread;
 import race.wheel.OffRoadTread;
 import race.wheel.Wheel;
 
-import java.io.File;
 import java.util.*;
 
 public class RacingGame {
 
-    private static final String PATH = "src" + File.separator + "JavaAutomationLab" + File.separator;
+    static VehicleDAOImpl vehicleDAOImpl = new VehicleDAOImpl();
 
     public static void main(String[] args) throws Exception {
 
-        TextFileReader textFileReader = new TextFileReader(PATH + "Points.txt");
+        TextFileReader textFileReader = new TextFileReader("Points.txt");
 
         List<PointLocation> pointLocations = new ArrayList<>();
 
@@ -49,7 +47,7 @@ public class RacingGame {
             );
         }
 
-        PropertyFileReader propertiesReader = new PropertyFileReader(PATH + "race.properties");
+        PropertyFileReader propertiesReader = new PropertyFileReader("race.properties");
 
         propertiesReader.read();
 
@@ -58,8 +56,8 @@ public class RacingGame {
         String[] vehicleMasses = propertiesReader.getPropertyValue("vehicleMasses").split(",");
 
         // todo: factories for engines and wheels
-        Engine[] engines = {new V8Engine(), new V8Engine(), new V4Engine()};
-        Wheel[] wheels = {new LowProfileTread(), new OffRoadTread(), new OffRoadTread()};
+        Engine[] engines = {new Engine(4, 0.4f), new Engine(6, 0.6f), new Engine(8, 0.8f)};
+        Wheel[] wheels = {new OffRoadTread(), new LowProfileTread(), new OffRoadTread()};
 
         if ((vehicleMasses.length != vehicleNames.length) || (vehicleMasses.length != vehicleVehicleNames.length)) {
             int[] temp = {vehicleMasses.length, vehicleNames.length, vehicleVehicleNames.length};
@@ -79,6 +77,7 @@ public class RacingGame {
                     wheels[i]
             );
             vehicles.add(currentVehicle);
+            vehicleDAOImpl.createVehicle(currentVehicle);
         }
 
         Random randomRoute;

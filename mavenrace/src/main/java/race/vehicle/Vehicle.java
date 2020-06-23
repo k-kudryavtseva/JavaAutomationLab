@@ -6,10 +6,10 @@ import race.wheel.Wheel;
 
 public class Vehicle {
     private String name;
-    private float point;
     private Engine engine;
     private Wheel wheel;
     private float mass; // in tones
+    private float point;
 
     public Vehicle(
             String name,
