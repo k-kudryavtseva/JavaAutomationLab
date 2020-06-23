@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="content_mapper">
+    <select id="getContent" resultMap="content_map">
+        SELECT *
+        FROM inputfiles
+    </select>
+    <insert id="createContent">
+        INSERT INTO inputfiles(input_content)
+        VALUES(#{inputText})
+    </insert>
+    <update id="updateContent">
+        UPDATE inputfiles
+        SET outputText=#{output_content}
+        WHERE inputfiles_id=#{id}
+    </update>
+
+    <resultMap id="content_map" type="formatter.Formatter" autoMapping="false"> <!-- тег ResultMap позволяет настраивать произвольный мапинг. Делать связи one-to-one и one-to-many
+    ResultMap представляет из себя описание правил связи полей EntityBean с колонками из таблиц.-->
+        <id property="id" column="inputfiles_id"/>
+        <result property="inputText" column="input_content"/>
+    </resultMap>
+</mapper>

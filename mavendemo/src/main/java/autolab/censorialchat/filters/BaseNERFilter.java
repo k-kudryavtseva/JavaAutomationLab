@@ -55,6 +55,7 @@ public class BaseNERFilter implements IFilter {
                 result = result + " " + token;
             }
         }
+
         return result;
     }
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="engine_mapper">
+    <select id="getEngine" resultMap="engine_map">
+        SELECT *
+        FROM engines
+    </select>
+    <select id="getCylinders" resultMap="engine_map">
+        SELECT cylinders
+        FROM engines
+        WHERE cylinders=#{cylinders}
+    </select>
+    <select id="getEngPByCylinders" resultMap="engine_map">
+        SELECT power
+        FROM engines
+        WHERE cylinders=#{cylinders}
+    </select>
+    <resultMap id="engine_map" type="race.engine.Engine" autoMapping="false"> <!--ResultMap представляет из себя описание правил связи полей EntityBean с колонками из таблиц-->
+        <id property="engineName" column="type"/>
+        <result property="numberOfCylinders" column="cylinders"/>
+        <result property="enginePower" column="power"/>
+    </resultMap>
+</mapper>
