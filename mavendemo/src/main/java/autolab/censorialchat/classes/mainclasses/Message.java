@@ -1,4 +1,4 @@
-package autolab.censorialchat.classes.c10;
+package autolab.censorialchat.classes.mainclasses;
 
 
 import javax.xml.bind.annotation.XmlElement;
@@ -8,28 +8,34 @@ import java.util.Date;
 
 @XmlType(name = "message")
 @XmlRootElement
-public class Message implements Comparable<Message>{
+public class Message implements Comparable<Message> {
 
-    public Message(){}
+    public Message() {}
 
-    public Message(String msg){
+    public Message(String msg) {
         this.msg = msg;
         this.date = new Date();
     }
 
-    public Message(String host, int port, String token, String msg, Date date){
+    public Message(String host, int port, String token, String msg, String uuid, Date date, int id, String processed_msg) {
         this.host = host;
         this.port = port;
         this.token = token;
         this.msg = msg;
+        this.uuid = uuid;
         this.date = date;
+        this.id = id;
+        this.processed_msg = processed_msg;
     }
 
     private String host;
     private int port;
     private String token;
     private String msg;
+    private String processed_msg;
     private Date date;
+    private String uuid;
+    private Integer id = null;
 
     @Override
     public int compareTo(Message message) {
@@ -46,17 +52,13 @@ public class Message implements Comparable<Message>{
         this.date = date;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
+    public void setMsg(String msg) { this.msg = msg; }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
+    public void setProcessed_msg(String msg) { this.processed_msg = msg; }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+    public void setPort(int port) { this.port = port; }
+
+    public void setToken(String token) { this.token = token; }
 
     @XmlElement(name = "host")
     public String getHost() {
@@ -83,5 +85,8 @@ public class Message implements Comparable<Message>{
         return token;
     }
 
-
+    @XmlElement(name = "processed_msg")
+    public String  getProcessedMsg() {
+        return processed_msg;
+    }
 }
