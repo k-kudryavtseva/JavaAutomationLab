@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user_mapper">
+    <insert id="createLogin">
+        INSERT INTO users(login)
+        VALUES(#{login})
+    </insert>
+    <insert id="createPassword">
+        INSERT INTO users(hash)
+        VALUES(#{hash})
+    </insert>
+    <insert id="createUser">
+        INSERT INTO users(login, hash)
+        VALUES(#{login}, #{hash})
+    </insert>
+    <select id="getAllLogins" resultMap="user_map">
+        SELECT login
+        FROM users
+    </select>
+
+    <resultMap id="user_map" type="formatter.user.User" autoMapping="false"> <!-- тег ResultMap позволяет настраивать произвольный мапинг. Делать связи one-to-one и one-to-many
+    ResultMap представляет из себя описание правил связи полей EntityBean с колонками из таблиц.-->
+        <id property="id" column="user_id"/>
+        <result property="login" column="login"/>
+        <result property="password" column="hash"/>
+        <collection property="logins" resultMap="user_mapper.user_map"/>
+    </resultMap>
+</mapper>

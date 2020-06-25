@@ -24,6 +24,6 @@
         </environment>
     </environments>
     <mappers> <!--в данном блоке необходимо описать все маперы, которые используются в проекте-->
-        <mapper resource="mapper/content_mapper.xml"/> <!--путь к файлу с SQL запросами -->
+        <mapper resource="mapper/user_mapper.xml"/> <!--путь к файлу с SQL запросами -->
     </mappers>
 </configuration>

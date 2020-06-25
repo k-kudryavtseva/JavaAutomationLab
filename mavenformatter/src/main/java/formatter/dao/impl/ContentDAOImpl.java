@@ -4,7 +4,7 @@ import formatter.config.SessionFactory;
 import org.apache.ibatis.session.SqlSession;
 
 public class ContentDAOImpl {
-    private final static String namespace = "mapper/content_mapper";
+    private final static String namespace = "mapper/content_mapper.xml";
 
     public static void createContent(String inputText) {
         SqlSession sqlSession = SessionFactory.getSession();
