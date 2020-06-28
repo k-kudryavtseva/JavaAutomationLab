@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="config.properties"> <!--ссылка на файл, где находятся параметры конфигурации базы данных, приведенные ниже -->
+        <property name="username" value="root" />
+        <property name="password" value="Monblan4807" />
+        <property name="url" value="jdbc:mysql://localhost:3306/race" />
+        <property name="driver" value="com.mysql.jdbc.Driver" />
+    </properties>
+    <settings> <!--в данном блоке можно настроить много параметров. Полный список параметров http://mybatis.github.io/mybatis-3/configuration.html#settings-->
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
+    <environments default="development"> <!--в данном блоке настраиваются подключения к БД-->
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}?allowPublicKeyRetrieval=true&amp;useSSL=false&amp;useUnicode=true&amp;serverTimezone=UTC"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers> <!--в данном блоке необходимо описать все маперы, которые используются в проекте-->
+        <mapper resource="mapper/engine_mapper.xml"/> <!--путь к файлу с SQL запросами -->
+        <mapper resource="mapper/frictioncoeftype_mapper.xml"/>
+        <mapper resource="mapper/material_mapper.xml"/>
+        <mapper resource="mapper/race_mapper.xml"/>
+        <mapper resource="mapper/raceprogress_mapper.xml"/>
+        <mapper resource="mapper/routesection_mapper.xml"/>
+        <mapper resource="mapper/supervisor_mapper.xml"/>
+        <mapper resource="mapper/vehicle_mapper.xml"/>
+        <mapper resource="mapper/wheeltype_mapper.xml"/>
+    </mappers>
+</configuration>
