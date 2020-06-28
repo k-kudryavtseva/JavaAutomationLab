@@ -2,23 +2,29 @@ package formatter.user;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
+
+import static java.lang.String.valueOf;
 
 public class User {
     private String login;
+    private String salt;
     private String hash;
     private int lisence;
-    private List<String > logins;
 
     public User() {}
 
-    public User(String login, String hash) {
+    public User(String login, String salt, String hash) {
         this.login = login;
-        this.hash = String.valueOf(hash.hashCode());
+        this.salt = salt;
+        this.hash = Integer.toHexString(salt.concat(hash).hashCode());
     }
 
     public String getLogin() {
         return login;
     }
+
+    public String getSalt() { return salt; }
 
     public String getHash() {
         return hash;
@@ -28,7 +34,9 @@ public class User {
         this.login = login;
     }
 
-    public List<String> getLogins() {
-        return logins;
+    public void setSalt(String salt) { this.salt = salt; }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 }

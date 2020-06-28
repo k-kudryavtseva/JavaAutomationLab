@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface UserDAO {
     void createUser(User user);
-    List<String> getAllLogins();
+    User checkLogin(String login);
+    User getSaltByLogin(String login);
+    User getHashBySalt(String salt);
 
 //    static void createLogin(String login) {
 //        SqlSession sqlSession = SessionFactory.getSession();

@@ -12,19 +12,38 @@
         VALUES(#{hash})
     </insert>
     <insert id="createUser">
-        INSERT INTO users(login, hash)
-        VALUES(#{login}, #{hash})
+        INSERT INTO users(login, salt, hash)
+        VALUES(#{login}, #{salt}, #{hash})
     </insert>
-    <select id="getAllLogins" resultMap="user_map">
+    <select id="checkLogin" resultMap="user_map"> <!-- resultMap="user_map" -->
         SELECT login
         FROM users
+        WHERE login=#{login}
+    </select>
+    <select id="getAllLogins" resultMap="user_map"> <!-- resultMap="user_map" -->
+        SELECT login
+        FROM users
+    </select>
+    <select id="getSaltByLogin" resultMap="user_map"> <!-- resultMap="user_map" -->
+        SELECT salt
+        FROM users
+        WHERE login=#{login}
+    </select>
+    <select id="getHashBySalt" resultMap="user_map"> <!-- resultMap="user_map" -->
+        SELECT login, hash, salt
+        FROM users
+        WHERE salt=#{salt}
     </select>
 
     <resultMap id="user_map" type="formatter.user.User" autoMapping="false"> <!-- тег ResultMap позволяет настраивать произвольный мапинг. Делать связи one-to-one и one-to-many
     ResultMap представляет из себя описание правил связи полей EntityBean с колонками из таблиц.-->
         <id property="id" column="user_id"/>
         <result property="login" column="login"/>
-        <result property="password" column="hash"/>
-        <collection property="logins" resultMap="user_mapper.user_map"/>
+        <result property="hash" column="hash"/>
+        <result property="salt" column="salt"/>
+<!--        <collection property="logins" ofType="List"> &lt;!&ndash; resultMap="user_mapper.user_map"&ndash;&gt;-->
+<!--            &lt;!&ndash;<id property="id" column="i_id" /> &ndash;&gt;-->
+<!--            <result property="login" column="login" />-->
+<!--        </collection>-->
     </resultMap>
 </mapper>

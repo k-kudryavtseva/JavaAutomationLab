@@ -5,8 +5,6 @@ import formatter.dao.UserDAO;
 import formatter.user.User;
 import org.apache.ibatis.session.SqlSession;
 
-import java.util.List;
-
 public class UserDAOImpl implements UserDAO {
     private final static String namespace = "user_mapper";
 
@@ -19,11 +17,29 @@ public class UserDAOImpl implements UserDAO {
    }
 
    @Override
-   public List getAllLogins() {
+   public User checkLogin(String login) {
        SqlSession sqlSession = SessionFactory.getSession();
-       List<User> allLogins = sqlSession.selectList(namespace + ".getAllLogins");
-       System.out.println(allLogins);
+       User having = sqlSession.selectOne(namespace + ".checkLogin", login);
+       System.out.println(having);
        sqlSession.close();
-       return allLogins;
+       return having;
+   }
+
+   @Override
+    public User getSaltByLogin(String login) {
+       SqlSession sqlSession = SessionFactory.getSession();
+       User salt = sqlSession.selectOne(namespace + ".getSaltByLogin", login);
+       System.out.println(salt);
+       sqlSession.close();
+       return salt;
+   }
+
+   @Override
+    public User getHashBySalt(String salt) {
+       SqlSession sqlSession = SessionFactory.getSession();
+       User user = sqlSession.selectOne(namespace + ".getHashBySalt", salt);
+       System.out.println(user);
+       sqlSession.close();
+       return user;
    }
 }
