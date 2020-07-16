@@ -24,7 +24,7 @@
 <tbody>
 <tr>
 <td>Кликнуть на кнопку “sign up”</td>
-<td>Появляется pop-up <img src="https://drive.google.com/thumbnail?id=1SZYvU5Yr4gEulSlwgH1NxZd0TExM85Fl&amp;authuser=0&amp;sz=w1920-h902" alt="Открыт файл &quot;aww-board (8).png&quot;"></td>
+<td>Появляется pop-up со следующими полями для заполнения: <ul><li>first name</li></ul> <ul><li>last name</li></ul> <ul><li>nickname</li></ul> <ul><li>password</li></ul> <ul><li>password confirmation</li></ul><ul><li>I agree with the terms of usage</li></ul> и кнопкой: <ul><li>SUBMIT</li></ul></td>
 </tr>
 </tbody>
 </table><h2 id="тест-кейс-№2-проверка-данных-в-поле-first-name">Тест-кейс №2 Проверка данных в поле “first name”</h2>
