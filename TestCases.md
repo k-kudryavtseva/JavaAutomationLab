@@ -170,7 +170,7 @@
 <td>В строке под полем появляется ошибка: «Password does not meet minimum requirements.» и подсказка в виде условий без маркера ✔, которые должны быть соблюдены при создании пароля: <ul><li>Minimum of 8 characters</li></ul> <ul><li>1 uppercase letter</li></ul> <ul><li>1 lowercase letter</li></ul> <ul><li>1 number</li></ul> заполнение остальных полей возможно, регистрация пользователя невозможна.</td>
 </tr>
 <tr>
-<td>Ввести в поле “password” строку 0123456789 в поле “password”</td>
+<td>Ввести в поле “password” строку 0123456789</td>
 <td>В строке под полем появляется ошибка: «Password does not meet minimum requirements.» и подсказка в виде условий без маркера ✔, которые должны быть соблюдены при создании пароля: <ul><li>1 uppercase letter</li></ul> <ul><li>1 lowercase letter</li></ul> заполнение остальных полей возможно, регистрация пользователя невозможна.</td>
 </tr>
 <tr>
@@ -178,8 +178,20 @@
 <td>В строке под полем “password” ошибка не появляется. Напротив каждого из условий создания пароля в строке под полем “password” появляется маркер ✔: <ul><li>Minimum of 8 characters</li></ul> <ul><li>1 uppercase letter</li></ul> <ul><li>1 lowercase letter</li></ul> <ul><li>1 number</li></ul></td>
 </tr>
 <tr>
-<td></td>
-<td></td>
+<td>Ввести в поле “password” строку “абв123”</td>
+<td>В строке под полем появляется ошибка: «Password does not meet minimum requirements.» и подсказка в виде условий без маркера ✔, которые должны быть соблюдены при создании пароля: <ul><li>Minimum of 8 characters</li></ul> <ul><li> 1 uppercase letter</li></ul> <ul><li>1 lowercase letter</li></ul> заполнение остальных полей возможно, регистрация пользователя невозможна.</td>
+</tr>
+<tr>
+<td>Ввести в поле “password” строку &amp;*%#(^$@*&amp;!"№;:?(){}[]’/|\`~-_</td>
+<td>В строке под полем появляется ошибка: «Password does not meet minimum requirements.» и подсказка в виде условий без маркера ✔, которые должны быть соблюдены при создании пароля: <ul><li> 1 uppercase letter</li></ul> <ul><li>1 lowercase letter</li></ul> <ul><li>1 number</li></ul></td>
+</tr>
+<tr>
+<td>Ввести в поле “password” строку "a B 1 * ", где в качестве последнего (восьмого) символа используется пробел</td>
+<td>В строке под полем появляется ошибка: «Password does not meet minimum requirements.» и подсказка в виде условий без маркера ✔, которые должны быть соблюдены при создании пароля: <ul><li>Minimum of 8 characters</li></ul></td>
+</tr>
+<tr>
+<td>Ввести в поле “password” строку "    a B 1", где в качестве первых четырёх символов используется пробел</td>
+<td>В строке под полем появляется ошибка: «Password does not meet minimum requirements.» и подсказка в виде условий без маркера ✔, которые должны быть соблюдены при создании пароля: <ul><li>Minimum of 8 characters</li></ul></td>
 </tr>
 </tbody>
 </table><h2 id="тест-кейс-№5-проверка-данных-в-поле-password-confirmation">Тест-кейс №5 Проверка данных в поле “password confirmation”</h2>
@@ -215,7 +227,7 @@
 <td>В строке под полем появляется ошибка: “Confirm you password.”</td>
 </tr>
 <tr>
-<td>0123456789</td>
+<td>Ввести в поле “password confirmation” строку 0123456789</td>
 <td>В строке под полем появляется ошибка “You entered a wrong password.”</td>
 </tr>
 <tr>
